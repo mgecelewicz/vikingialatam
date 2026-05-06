@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viking Latam | Portafolio Cinematográfico</title>
+    <title>Viking Latam | Portfolio</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,15 +18,14 @@
             font-family: 'Inter', sans-serif;
             background-color: #030303;
             color: #ffffff;
-            overflow-x: hidden;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
         h1, h2, h3, .font-oswald {
             font-family: 'Oswald', sans-serif;
         }
         
-        /* Personalización de la barra de desplazamiento */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
@@ -64,7 +63,6 @@
             z-index: 30;
             max-width: 320px;
             pointer-events: auto;
-            transform: scale(0.8);
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -97,7 +95,7 @@
 
     <div id="impact-flash"></div>
 
-    <!-- Preloader Cinematográfico -->
+    <!-- Preloader -->
     <div id="preloader" class="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center transition-opacity duration-1000">
         <div class="text-[#00e5ff] font-oswald text-3xl tracking-[0.4em] animate-pulse uppercase mb-6">VIKING LATAM</div>
         <div class="w-64 h-[1px] bg-white/10 relative overflow-hidden">
@@ -109,10 +107,10 @@
         @keyframes shimmer { 100% { transform: translateX(100%); } }
     </style>
 
-    <!-- Fallback de Carga -->
+    <!-- Overlay de carga -->
     <div id="upload-overlay" class="fixed inset-0 bg-[#030303] z-[10000] hidden flex-col items-center justify-center text-center px-6">
-        <div class="text-white font-oswald text-4xl tracking-widest mb-6">BIENVENIDO</div>
-        <p class="text-gray-400 mb-10 max-w-lg text-lg">Para una experiencia completa, carga la imagen <b>state_01.jpg</b> que se encuentra en tu carpeta de activos.</p>
+        <div class="text-white font-oswald text-4xl tracking-widest mb-6">SISTEMA LISTO</div>
+        <p class="text-gray-400 mb-10 max-w-lg text-lg">Carga la imagen <b>state_01.jpg</b> para desatar el tornado.</p>
         <label class="cursor-pointer bg-[#00e5ff] text-black font-oswald font-bold tracking-widest py-5 px-12 rounded-full hover:bg-white transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-cyan-500/20">
             CARGAR state_01.jpg
             <input type="file" id="local-image-upload" class="hidden" accept="image/*">
@@ -121,7 +119,7 @@
 
     <canvas id="webgl-canvas"></canvas>
 
-    <!-- Navegación Minimalista -->
+    <!-- Navegación -->
     <nav id="main-nav" class="fixed top-0 left-0 w-full z-50 p-10 flex justify-between items-center mix-blend-difference">
         <div class="text-2xl font-oswald font-bold tracking-[0.2em] text-white uppercase"><span class="text-cyan">VIKING</span>LATAM</div>
         <div class="hidden md:flex gap-16 text-[10px] font-bold tracking-[0.4em] uppercase text-gray-400">
@@ -131,29 +129,29 @@
         </div>
     </nav>
 
-    <!-- Capa de Servicios -->
+    <!-- Contenedor del Hero -->
     <section id="hero-master" class="relative h-screen w-full flex items-center justify-center overflow-hidden">
         <div id="services-layer" class="absolute inset-0 w-full h-full pointer-events-none z-30">
             <div id="s1" class="service-card top-[20%] left-[10%] floating-service">
                 <h3 class="font-oswald font-bold text-4xl text-white uppercase mb-3">Reels & Shorts</h3>
-                <p class="text-cyan text-xs tracking-widest uppercase font-bold border-l-2 border-cyan pl-4">Impacto Vertical Absoluto</p>
+                <p class="text-cyan text-xs tracking-widest uppercase font-bold border-l-2 border-cyan pl-4">Impacto Vertical</p>
             </div>
             <div id="s2" class="service-card top-[20%] right-[10%] text-right floating-service">
                 <h3 class="font-oswald font-bold text-4xl text-white uppercase mb-3">UGC Strategy</h3>
-                <p class="text-cyan text-xs tracking-widest uppercase font-bold border-r-2 border-cyan pr-4">Autenticidad que Vende</p>
+                <p class="text-cyan text-xs tracking-widest uppercase font-bold border-r-2 border-cyan pr-4">Autenticidad</p>
             </div>
             <div id="s3" class="service-card bottom-[20%] left-[10%] floating-service">
                 <h3 class="font-oswald font-bold text-4xl text-white uppercase mb-3">IA Creativa</h3>
-                <p class="text-cyan text-xs tracking-widest uppercase font-bold border-l-2 border-cyan pl-4">El Futuro Visual Hoy</p>
+                <p class="text-cyan text-xs tracking-widest uppercase font-bold border-l-2 border-cyan pl-4">Innovación IA</p>
             </div>
             <div id="s4" class="service-card bottom-[20%] right-[10%] text-right floating-service">
                 <h3 class="font-oswald font-bold text-4xl text-white uppercase mb-3">Edición Pro</h3>
-                <p class="text-cyan text-xs tracking-widest uppercase font-bold border-r-2 border-cyan pr-4">Narrativa Cinematográfica</p>
+                <p class="text-cyan text-xs tracking-widest uppercase font-bold border-r-2 border-cyan pr-4">Narrativa Visual</p>
             </div>
         </div>
     </section>
 
-    <!-- El motor de la experiencia -->
+    <!-- Espacio de Scroll -->
     <div id="scroll-engine" class="h-[1200vh] pointer-events-none"></div>
 
     <footer id="final-footer" class="relative z-40 bg-[#030303] bg-grid py-32 px-10 border-t border-white/5">
@@ -163,7 +161,6 @@
         </div>
     </footer>
 
-    <!-- Scripts de Librerías -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -171,7 +168,6 @@
     <script>
         gsap.registerPlugin(ScrollTrigger);
 
-        // Textura dinámica para el título cinemático
         function createTextTexture() {
             const canvas = document.createElement('canvas');
             canvas.width = 2048;
@@ -180,22 +176,15 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            
-            // "VIKING"
             ctx.font = 'bold 230px Oswald';
             ctx.fillStyle = '#00e5ff';
             ctx.fillText('VIKING', canvas.width/2 - 300, canvas.height/2 - 80);
-            
-            // "LATAM"
             ctx.fillStyle = '#ffffff';
             ctx.fillText('LATAM', canvas.width/2 + 300, canvas.height/2 - 80);
-            
-            // Subtítulo elegante
             ctx.font = '300 36px Inter'; 
             ctx.fillStyle = '#6b7280';
             ctx.letterSpacing = "28px";
             ctx.fillText('CONTENIDO VISUAL • REDES SOCIALES', canvas.width/2, canvas.height/2 + 110);
-            
             const tex = new THREE.CanvasTexture(canvas);
             tex.needsUpdate = true;
             return tex;
@@ -204,18 +193,12 @@
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
         camera.position.z = 15;
-
-        const renderer = new THREE.WebGLRenderer({ 
-            canvas: document.getElementById('webgl-canvas'), 
-            alpha: true, 
-            antialias: true 
-        });
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
         const clock = new THREE.Clock();
         let faceParticles, textParticles;
-
         const loader = new THREE.TextureLoader();
         loader.setCrossOrigin("anonymous");
         
@@ -225,7 +208,6 @@
             createCinematicSystem(texture);
         }
 
-        // Intento de carga automática de la imagen del usuario
         loader.load('state_01.jpg', initApp, undefined, () => {
             document.getElementById('preloader').style.display = 'none';
             document.getElementById('upload-overlay').style.display = 'flex';
@@ -265,31 +247,17 @@
             void main() {
                 vUv = uv;
                 vec3 pos = position;
-
-                // --- SISTEMA DE TORNADO ---
                 float t = uTime * (7.0 + uProgress * 42.0);
                 float angle = aCenter.y * 1.6 - t + aRandom * 28.0; 
                 float suction = mix(1.0, 0.04, clamp(uProgress * 1.12, 0.0, 1.0));
                 float r = (1.8 + aRandom * 19.0) * suction * (1.0 + uProgress * 3.8);
-                
-                vec3 tornadoPos = vec3(
-                    cos(angle) * r,
-                    aCenter.y * 2.8 + sin(uTime * 1.4 + aRandom * 12.0) * 5.5,
-                    sin(angle) * r - (uProgress * 22.0)
-                );
-
-                // --- RECONSTRUCCIÓN VIKINGA ---
+                vec3 tornadoPos = vec3(cos(angle) * r, aCenter.y * 2.8 + sin(uTime * 1.4 + aRandom * 12.0) * 5.5, sin(angle) * r - (uProgress * 22.0));
                 vec3 vikingPos = aTarget;
-
-                // --- MEZCLA DE ESTADOS ---
                 vec3 finalPos = mix(pos, tornadoPos, uProgress);
                 finalPos = mix(finalPos, vikingPos, uViking);
-                
-                // IMPACTO DEL RAYO
                 float sForce = pow(uStrike, 5.0);
                 finalPos.z += sForce * 140.0;
                 finalPos.xy *= (1.0 + sForce * 38.0);
-
                 vEnergy = uViking + uStrike;
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(finalPos, 1.0);
             }
@@ -300,17 +268,13 @@
             uniform float uViking, uStrike, uTime, uAlpha;
             varying vec2 vUv;
             varying float vEnergy;
-
             void main() {
                 vec3 cyan = vec3(0.0, 0.95, 1.0);
                 vec4 color = texture2D(uTexture, vUv);
-                
                 if(color.a < 0.1 || dot(color.rgb, vec3(0.3, 0.59, 0.11)) < 0.02) discard;
-
                 float pulse = sin(uTime * 20.0) * 0.15 + 0.85;
                 color.rgb = mix(color.rgb, cyan * pulse, vEnergy * 0.96);
                 color.rgb += uStrike * 0.85; 
-                
                 float finalAlpha = uAlpha * (1.0 - smoothstep(0.99, 1.0, uStrike));
                 gl_FragColor = vec4(color.rgb, finalAlpha);
             }
@@ -318,75 +282,30 @@
 
         function createCinematicSystem(texture) {
             const aspect = texture.image ? texture.image.width / texture.image.height : 1;
-            const sharedUniforms = {
-                uProgress: { value: 0 },
-                uViking: { value: 0 },
-                uStrike: { value: 0 },
-                uTime: { value: 0 },
-                uAlpha: { value: 1.0 }
-            };
-
-            // Sistema de partículas para el rostro/vikingo
-            faceMat = new THREE.ShaderMaterial({
-                uniforms: { ...sharedUniforms, uTexture: { value: texture }, uAlpha: { value: 1.0 } },
-                vertexShader, fragmentShader, transparent: true, side: THREE.DoubleSide
-            });
-            faceParticles = new THREE.Mesh(createParticleGeometry(15 * aspect, 15, 180, true), faceMat);
+            const sharedUniforms = { uProgress: { value: 0 }, uViking: { value: 0 }, uStrike: { value: 0 }, uTime: { value: 0 }, uAlpha: { value: 1.0 } };
+            faceParticles = new THREE.Mesh(createParticleGeometry(15 * aspect, 15, 180, true), new THREE.ShaderMaterial({ uniforms: { ...sharedUniforms, uTexture: { value: texture }, uAlpha: { value: 1.0 } }, vertexShader, fragmentShader, transparent: true, side: THREE.DoubleSide }));
             scene.add(faceParticles);
-
-            // Sistema de partículas para el texto de marca
-            const textTexture = createTextTexture();
-            textMat = new THREE.ShaderMaterial({
-                uniforms: { ...sharedUniforms, uTexture: { value: textTexture }, uAlpha: { value: 0.0 } },
-                vertexShader, fragmentShader, transparent: true, side: THREE.DoubleSide
-            });
-            textParticles = new THREE.Mesh(createParticleGeometry(24, 12, 140, false), textMat);
+            textParticles = new THREE.Mesh(createParticleGeometry(24, 12, 140, false), new THREE.ShaderMaterial({ uniforms: { ...sharedUniforms, uTexture: { value: createTextTexture() }, uAlpha: { value: 0.0 } }, vertexShader, fragmentShader, transparent: true, side: THREE.DoubleSide }));
             textParticles.position.z = 2.0;
             scene.add(textParticles);
-
-            setupCinematicTimeline(faceMat, textMat);
+            setupCinematicTimeline(faceParticles.material, textParticles.material);
         }
 
         function createParticleGeometry(w, h, res, isViking) {
             const geo = new THREE.PlaneGeometry(w, h, res, res).toNonIndexed();
             const count = geo.attributes.position.count;
-            const randoms = new Float32Array(count);
-            const centers = new Float32Array(count * 3);
-            const targets = new Float32Array(count * 3);
-
+            const randoms = new Float32Array(count), centers = new Float32Array(count * 3), targets = new Float32Array(count * 3);
             for(let i = 0; i < count; i += 3) {
-                const r = Math.random();
-                const cx = geo.attributes.position.getX(i);
-                const cy = geo.attributes.position.getY(i);
-                
-                let tx, ty, tz = -5.0;
-                
+                const r = Math.random(), cx = geo.attributes.position.getX(i), cy = geo.attributes.position.getY(i);
+                let tx = cx, ty = cy, tz = -5.0;
                 if(isViking) {
-                    // Diseño de la silueta vikinga final
-                    if (r > 0.85) { // Brazo y Martillo
-                        tx = 6.5 + (Math.random() - 0.5) * 4.5; 
-                        ty = 2.0 + (Math.random() - 0.5) * 6.0;
-                        tz = -2.5;
-                    } else if (r > 0.70) { // Casco y cuernos
-                        const side = Math.random() > 0.5 ? 1 : -1;
-                        tx = side * (4.0 + Math.random() * 5.0);
-                        ty = 8.5 + Math.random() * 5.0;
-                    } else { // Cabeza y hombros amplios
-                        tx = (Math.random() - 0.5) * 12.0;
-                        ty = -3.0 + (Math.random() - 0.5) * 14.0;
-                    }
-                } else {
-                    tx = cx; ty = cy;
+                    if (r > 0.85) { tx = 6.5 + (Math.random() - 0.5) * 4.5; ty = 2.0 + (Math.random() - 0.5) * 6.0; tz = -2.5; }
+                    else if (r > 0.70) { tx = (Math.random() > 0.5 ? 1 : -1) * (4.0 + Math.random() * 5.0); ty = 8.5 + Math.random() * 5.0; }
+                    else { tx = (Math.random() - 0.5) * 12.0; ty = -3.0 + (Math.random() - 0.5) * 14.0; }
                 }
-
                 for(let j = 0; j < 3; j++) {
-                    randoms[i+j] = r;
-                    centers[(i+j)*3] = cx;
-                    centers[(i+j)*3+1] = cy;
-                    centers[(i+j)*3+2] = (Math.random()-0.5) * 6.0;
-                    targets[(i+j)*3] = tx;
-                    targets[(i+j)*3+1] = ty;
-                    targets[(i+j)*3+2] = tz;
+                    randoms[i+j] = r; centers[(i+j)*3] = cx; centers[(i+j)*3+1] = cy; centers[(i+j)*3+2] = (Math.random()-0.5) * 6.0;
+                    targets[(i+j)*3] = tx; targets[(i+j)*3+1] = ty; targets[(i+j)*3+2] = tz;
                 }
             }
             geo.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1));
@@ -395,91 +314,20 @@
             return geo;
         }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            const t = clock.getElapsedTime();
-            if(faceParticles) faceParticles.material.uniforms.uTime.value = t;
-            if(textParticles) textParticles.material.uniforms.uTime.value = t;
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        // COREOGRAFÍA DINÁMICA POR SCROLL
         function setupCinematicTimeline(faceMat, textMat) {
-            const masterTl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: "#hero-master",
-                    start: "top top",
-                    endTrigger: "#scroll-engine",
-                    end: "bottom bottom",
-                    scrub: 1.2,
-                    pin: true,
-                    anticipatePin: 1,
-                    invalidateOnRefresh: true,
-                    onLeave: () => document.getElementById('final-footer').classList.add('visible'),
-                    onEnterBack: () => document.getElementById('final-footer').classList.remove('visible')
-                }
-            });
-
+            const masterTl = gsap.timeline({ scrollTrigger: { trigger: "#hero-master", start: "top top", endTrigger: "#scroll-engine", end: "bottom bottom", scrub: 1.2, pin: true, anticipatePin: 1, onLeave: () => document.getElementById('final-footer').classList.add('visible'), onEnterBack: () => document.getElementById('final-footer').classList.remove('visible') } });
             const services = ["#s1", "#s2", "#s3", "#s4"];
             gsap.set(services, { opacity: 0, scale: 0.7, y: 30 });
-
-            // INICIALIZACIÓN
-            masterTl.set(textMat.uniforms.uAlpha, { value: 0 }, 0);
-            masterTl.set(faceMat.uniforms.uProgress, { value: 0 }, 0);
-            masterTl.set(faceMat.uniforms.uViking, { value: 0 }, 0);
-            masterTl.set(faceMat.uniforms.uStrike, { value: 0 }, 0);
-
-            // 1. Aparición de Marca (0-15%)
-            masterTl.to(textMat.uniforms.uAlpha, { value: 1.0, duration: 15, ease: "power2.out" }, 0);
-
-            // 2. Tornado (15-70%)
-            masterTl.to([faceMat.uniforms.uProgress, textMat.uniforms.uProgress], {
-                value: 1.0,
-                duration: 55,
-                ease: "none"
-            }, 15);
-
-            // 3. Morph Vikingo (70-85%)
-            masterTl.to([faceMat.uniforms.uViking, textMat.uniforms.uViking], {
-                value: 1.0,
-                duration: 15,
-                ease: "power2.inOut"
-            }, 70);
-
-            // 4. El Impacto (85-92%)
-            masterTl.to([faceMat.uniforms.uStrike, textMat.uniforms.uStrike], {
-                value: 1.0,
-                duration: 7,
-                ease: "expo.in",
-                onStart: () => {
-                    gsap.fromTo("#impact-flash", { opacity: 1 }, { opacity: 0, duration: 1.2, ease: "power2.out" });
-                    gsap.fromTo(camera.position,
-                        { x: (Math.random()-0.5)*3.5, y: (Math.random()-0.5)*3.5 },
-                        { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" }
-                    );
-                }
-            }, 85);
-
-            // 5. Revelación de Servicios (92-100%)
-            services.forEach((s, i) => {
-                masterTl.to(s, {
-                    opacity: 1,
-                    scale: 1,
-                    y: 0,
-                    duration: 8,
-                    ease: "back.out(1.8)"
-                }, 92 + i * 2);
-            });
-
-            masterTl.to({}, { duration: 10 }, 100);
+            masterTl.to(textMat.uniforms.uAlpha, { value: 1.0, duration: 15 }, 0);
+            masterTl.to([faceMat.uniforms.uProgress, textMat.uniforms.uProgress], { value: 1.0, duration: 55 }, 15);
+            masterTl.to([faceMat.uniforms.uViking, textMat.uniforms.uViking], { value: 1.0, duration: 15 }, 70);
+            masterTl.to([faceMat.uniforms.uStrike, textMat.uniforms.uStrike], { value: 1.0, duration: 7, onStart: () => { gsap.fromTo("#impact-flash", { opacity: 1 }, { opacity: 0, duration: 1.2 }); gsap.fromTo(camera.position, { x: (Math.random()-0.5)*3.5, y: (Math.random()-0.5)*3.5 }, { x: 0, y: 0, duration: 0.7 }); } }, 85);
+            services.forEach((s, i) => masterTl.to(s, { opacity: 1, scale: 1, y: 0, duration: 8 }, 92 + i * 2));
         }
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        function animate() { requestAnimationFrame(animate); const t = clock.getElapsedTime(); if(faceParticles) faceParticles.material.uniforms.uTime.value = t; if(textParticles) textParticles.material.uniforms.uTime.value = t; renderer.render(scene, camera); }
+        animate();
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
     </script>
 </body>
 </html>
