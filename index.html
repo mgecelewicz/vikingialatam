@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viking Latam | Portfolio</title>
+    <title>Viking Latam | Particle Vortex</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Fuentes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
@@ -31,12 +29,6 @@
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #00e5ff; }
 
-        .bg-grid {
-            background-size: 50px 50px;
-            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-        }
-        
         #webgl-canvas {
             position: fixed; 
             top: 0;
@@ -68,34 +60,15 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 2.5rem;
             border-radius: 1.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        @keyframes float-gentle {
-            0%, 100% { transform: translate(0, 0) rotate(0); }
-            33% { transform: translate(8px, -12px) rotate(1deg); }
-            66% { transform: translate(-8px, -6px) rotate(-1deg); }
-        }
-        .floating-service {
-            animation: float-gentle 8s ease-in-out infinite;
         }
 
         .text-cyan { color: #00e5ff; }
-
-        #final-footer {
-            opacity: 0;
-            transition: opacity 1s ease;
-        }
-        #final-footer.visible {
-            opacity: 1;
-        }
     </style>
 </head>
 <body class="antialiased">
 
     <div id="impact-flash"></div>
 
-    <!-- Preloader -->
     <div id="preloader" class="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center transition-opacity duration-1000">
         <div class="text-[#00e5ff] font-oswald text-3xl tracking-[0.4em] animate-pulse uppercase mb-6">VIKING LATAM</div>
         <div class="w-64 h-[1px] bg-white/10 relative overflow-hidden">
@@ -103,63 +76,48 @@
         </div>
     </div>
 
-    <style>
-        @keyframes shimmer { 100% { transform: translateX(100%); } }
-    </style>
-
-    <!-- Overlay de carga -->
     <div id="upload-overlay" class="fixed inset-0 bg-[#030303] z-[10000] hidden flex-col items-center justify-center text-center px-6">
-        <div class="text-white font-oswald text-4xl tracking-widest mb-6">SISTEMA LISTO</div>
-        <p class="text-gray-400 mb-10 max-w-lg text-lg">Carga la imagen <b>state_01.jpg</b> para desatar el tornado.</p>
-        <label class="cursor-pointer bg-[#00e5ff] text-black font-oswald font-bold tracking-widest py-5 px-12 rounded-full hover:bg-white transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-cyan-500/20">
-            CARGAR state_01.jpg
+        <div class="text-white font-oswald text-4xl tracking-widest mb-6 uppercase">Vórtice no detectado</div>
+        <p class="text-gray-400 mb-10 max-w-lg text-lg">Para activar la experiencia, selecciona la imagen <b>state_01.jpg</b> desde tu dispositivo.</p>
+        <label id="upload-label" class="cursor-pointer bg-[#00e5ff] text-black font-oswald font-bold tracking-widest py-5 px-12 rounded-full hover:bg-white transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-cyan-500/20">
+            SELECCIONAR ARCHIVO
             <input type="file" id="local-image-upload" class="hidden" accept="image/*">
         </label>
     </div>
 
     <canvas id="webgl-canvas"></canvas>
 
-    <!-- Navegación -->
     <nav id="main-nav" class="fixed top-0 left-0 w-full z-50 p-10 flex justify-between items-center mix-blend-difference">
         <div class="text-2xl font-oswald font-bold tracking-[0.2em] text-white uppercase"><span class="text-cyan">VIKING</span>LATAM</div>
         <div class="hidden md:flex gap-16 text-[10px] font-bold tracking-[0.4em] uppercase text-gray-400">
-            <a href="#" class="hover:text-cyan transition-colors">Portafolio</a>
+            <a href="#" class="hover:text-cyan transition-colors">Portfolio</a>
             <a href="#" class="hover:text-cyan transition-colors">Servicios</a>
             <a href="mailto:ugece2025@gmail.com" class="hover:text-cyan transition-colors">Contacto</a>
         </div>
     </nav>
 
-    <!-- Contenedor del Hero -->
     <section id="hero-master" class="relative h-screen w-full flex items-center justify-center overflow-hidden">
         <div id="services-layer" class="absolute inset-0 w-full h-full pointer-events-none z-30">
-            <div id="s1" class="service-card top-[20%] left-[10%] floating-service">
+            <div id="s1" class="service-card top-[20%] left-[10%]">
                 <h3 class="font-oswald font-bold text-4xl text-white uppercase mb-3">Reels & Shorts</h3>
                 <p class="text-cyan text-xs tracking-widest uppercase font-bold border-l-2 border-cyan pl-4">Impacto Vertical</p>
             </div>
-            <div id="s2" class="service-card top-[20%] right-[10%] text-right floating-service">
+            <div id="s2" class="service-card top-[20%] right-[10%] text-right">
                 <h3 class="font-oswald font-bold text-4xl text-white uppercase mb-3">UGC Strategy</h3>
                 <p class="text-cyan text-xs tracking-widest uppercase font-bold border-r-2 border-cyan pr-4">Autenticidad</p>
             </div>
-            <div id="s3" class="service-card bottom-[20%] left-[10%] floating-service">
+            <div id="s3" class="service-card bottom-[20%] left-[10%]">
                 <h3 class="font-oswald font-bold text-4xl text-white uppercase mb-3">IA Creativa</h3>
                 <p class="text-cyan text-xs tracking-widest uppercase font-bold border-l-2 border-cyan pl-4">Innovación IA</p>
             </div>
-            <div id="s4" class="service-card bottom-[20%] right-[10%] text-right floating-service">
+            <div id="s4" class="service-card bottom-[20%] right-[10%] text-right">
                 <h3 class="font-oswald font-bold text-4xl text-white uppercase mb-3">Edición Pro</h3>
                 <p class="text-cyan text-xs tracking-widest uppercase font-bold border-r-2 border-cyan pr-4">Narrativa Visual</p>
             </div>
         </div>
     </section>
 
-    <!-- Espacio de Scroll -->
     <div id="scroll-engine" class="h-[1200vh] pointer-events-none"></div>
-
-    <footer id="final-footer" class="relative z-40 bg-[#030303] bg-grid py-32 px-10 border-t border-white/5">
-        <div class="max-w-5xl mx-auto text-center">
-            <h2 class="text-6xl md:text-8xl font-oswald font-bold text-white mb-10 uppercase tracking-tighter leading-none">¿Llevamos tu marca al <span class="text-cyan">siguiente nivel</span>?</h2>
-            <a href="https://wa.me/5491569667000" target="_blank" class="inline-block bg-[#00e5ff] text-black font-oswald font-bold py-6 px-16 rounded-full hover:bg-white transition-all uppercase tracking-widest text-sm shadow-2xl shadow-cyan-500/30 transform hover:-translate-y-1">Hablemos por WhatsApp</a>
-        </div>
-    </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -170,24 +128,105 @@
 
         function createTextTexture() {
             const canvas = document.createElement('canvas');
-            canvas.width = 2048;
-            canvas.height = 1024;
+            canvas.width = 2048; canvas.height = 1024;
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             ctx.font = 'bold 230px Oswald';
             ctx.fillStyle = '#00e5ff';
             ctx.fillText('VIKING', canvas.width/2 - 300, canvas.height/2 - 80);
             ctx.fillStyle = '#ffffff';
             ctx.fillText('LATAM', canvas.width/2 + 300, canvas.height/2 - 80);
-            ctx.font = '300 36px Inter'; 
-            ctx.fillStyle = '#6b7280';
-            ctx.letterSpacing = "28px";
-            ctx.fillText('CONTENIDO VISUAL • REDES SOCIALES', canvas.width/2, canvas.height/2 + 110);
             const tex = new THREE.CanvasTexture(canvas);
             tex.needsUpdate = true;
             return tex;
+        }
+
+        // Lógica para leer píxeles de un asset o generar fallback de Vikingo frontal
+        function createTargetParticlesFromImage(imagePath, count, callback) {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 256; 
+                canvas.height = 256;
+                ctx.drawImage(img, 0, 0, 256, 256);
+                const data = ctx.getImageData(0, 0, 256, 256).data;
+                const validPixels = [];
+                
+                for(let i = 0; i < data.length; i += 4) {
+                    if(data[i+3] > 50) { 
+                        const x = (i/4) % 256;
+                        const y = Math.floor((i/4) / 256);
+                        validPixels.push({ x: (x / 256 - 0.5), y: -(y / 256 - 0.5) });
+                    }
+                }
+
+                const targets = new Float32Array(count * 3);
+                if(validPixels.length > 0) {
+                    for(let i = 0; i < count; i++) {
+                        const p = validPixels[Math.floor(Math.random() * validPixels.length)];
+                        targets[i*3] = p.x * 24.0; 
+                        targets[i*3+1] = p.y * 24.0; 
+                        targets[i*3+2] = (Math.random() - 0.5) * 1.5; 
+                    }
+                } else {
+                    generateFallbackTargets(count, targets);
+                }
+                callback(targets);
+            };
+            img.onerror = () => {
+                console.warn("Asset viking_target.png no encontrado. Usando silueta determinística del vikingo con martillo.");
+                const targets = new Float32Array(count * 3);
+                generateFallbackTargets(count, targets);
+                callback(targets);
+            };
+            img.src = imagePath;
+        }
+
+        // Forma de silueta determinística: Cabeza, barba, hombros, brazo, martillo.
+        function generateFallbackTargets(count, targets) {
+            for(let i=0; i<count; i++) {
+                const r = Math.random();
+                let x, y, z = (Math.random() - 0.5) * 1.5;
+                
+                if (r < 0.15) { 
+                    // Cabeza / Casco
+                    const angle = Math.random() * Math.PI * 2;
+                    const rad = Math.random() * 2.0;
+                    x = Math.cos(angle) * rad;
+                    y = 5.0 + Math.sin(angle) * rad;
+                } else if (r < 0.35) { 
+                    // Barba
+                    const t = Math.random();
+                    const width = 2.0 * (1.0 - t);
+                    x = (Math.random() - 0.5) * width;
+                    y = 5.0 - t * 3.5;
+                } else if (r < 0.70) { 
+                    // Hombros / Torso
+                    x = (Math.random() - 0.5) * 10.0;
+                    y = 1.0 - Math.random() * 5.0;
+                    y -= (x * x) * 0.04; // Curva de los hombros
+                } else if (r < 0.85) { 
+                    // Brazo derecho
+                    x = 5.0 + Math.random() * 4.0;
+                    y = -0.5 - Math.random() * 3.5;
+                } else { 
+                    // Martillo
+                    const isHandle = Math.random() > 0.4;
+                    if(isHandle) { // Mango
+                        x = 8.5 + (Math.random() - 0.5) * 0.4;
+                        y = -3.0 + (Math.random() - 0.5) * 5.0;
+                    } else { // Cabeza del Martillo
+                        x = 8.5 + (Math.random() - 0.5) * 3.0;
+                        y = -0.5 + (Math.random() - 0.5) * 1.5;
+                    }
+                }
+                targets[i*3] = x;
+                targets[i*3+1] = y;
+                targets[i*3+2] = z;
+            }
         }
 
         const scene = new THREE.Scene();
@@ -198,14 +237,17 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
         const clock = new THREE.Clock();
-        let faceParticles, textParticles;
+        let facePoints, textPoints, solidFace, solidText, energyLines, masterTl;
         const loader = new THREE.TextureLoader();
         loader.setCrossOrigin("anonymous");
         
         function initApp(texture) {
             document.getElementById('preloader').style.opacity = 0;
-            setTimeout(() => document.getElementById('preloader').style.display = 'none', 1000);
-            createCinematicSystem(texture);
+            setTimeout(() => {
+                document.getElementById('preloader').style.display = 'none';
+                document.getElementById('upload-overlay').style.display = 'none';
+            }, 1000);
+            createParticleSystem(texture);
         }
 
         loader.load('state_01.jpg', initApp, undefined, () => {
@@ -215,119 +257,350 @@
 
         document.getElementById('local-image-upload').addEventListener('change', e => {
             const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = event => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const tex = new THREE.Texture(img);
-                        tex.needsUpdate = true;
-                        document.getElementById('upload-overlay').style.display = 'none';
-                        if (faceParticles) scene.remove(faceParticles);
-                        if (textParticles) scene.remove(textParticles);
-                        createCinematicSystem(tex);
-                    };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
+            if (!file) return;
+            document.getElementById('upload-label').innerText = "PROCESANDO...";
+            
+            const reader = new FileReader();
+            reader.onload = event => {
+                const imgLoader = new THREE.TextureLoader();
+                imgLoader.load(event.target.result, (tex) => {
+                    if (facePoints) scene.remove(facePoints);
+                    if (textPoints) scene.remove(textPoints);
+                    if (solidFace) scene.remove(solidFace);
+                    if (solidText) scene.remove(solidText);
+                    if (energyLines) scene.remove(energyLines);
+                    if (masterTl) masterTl.kill();
+                    ScrollTrigger.getAll().forEach(st => st.kill());
+                    initApp(tex);
+                });
+            };
+            reader.readAsDataURL(file);
         });
 
-        const vertexShader = `
-            uniform float uProgress, uViking, uStrike, uTime, uAlpha;
+        const particleVS = `
+            uniform float uBreak, uSwirl, uTime, uStrike;
             attribute float aRandom;
-            attribute vec3 aCenter, aTarget;
+            attribute vec3 aCenter;
             varying vec2 vUv;
-            varying float vEnergy;
-
-            float random (vec2 st) {
-                return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
-            }
+            varying float vGlow;
+            varying float vParticleSize; 
 
             void main() {
                 vUv = uv;
                 vec3 pos = position;
-                float t = uTime * (7.0 + uProgress * 42.0);
-                float angle = aCenter.y * 1.6 - t + aRandom * 28.0; 
-                float suction = mix(1.0, 0.04, clamp(uProgress * 1.12, 0.0, 1.0));
-                float r = (1.8 + aRandom * 19.0) * suction * (1.0 + uProgress * 3.8);
-                vec3 tornadoPos = vec3(cos(angle) * r, aCenter.y * 2.8 + sin(uTime * 1.4 + aRandom * 12.0) * 5.5, sin(angle) * r - (uProgress * 22.0));
-                vec3 vikingPos = aTarget;
-                vec3 finalPos = mix(pos, tornadoPos, uProgress);
-                finalPos = mix(finalPos, vikingPos, uViking);
-                float sForce = pow(uStrike, 5.0);
-                finalPos.z += sForce * 140.0;
-                finalPos.xy *= (1.0 + sForce * 38.0);
-                vEnergy = uViking + uStrike;
+
+                // Micro-Desintegración pura y esférica, sin desplazar el centro ni subir
+                float pBreak = smoothstep(0.0, 1.0, uBreak); 
+                vec3 dirFromCenter = normalize(pos);
+                
+                // Distribución pseudo-aleatoria esférica
+                float noiseX = fract(sin(aRandom * 12.9898) * 43758.5453) - 0.5;
+                float noiseY = fract(sin(aRandom * 78.233) * 43758.5453) - 0.5;
+                float noiseZ = fract(sin(aRandom * 37.719) * 43758.5453) - 0.5;
+                vec3 randomDir = normalize(vec3(noiseX, noiseY, noiseZ));
+                
+                vec3 breakDir = normalize(mix(dirFromCenter, randomDir, 0.6));
+                vec3 breakPos = pos + breakDir * (pBreak * 3.5);
+
+                // Tornado: Matemática de vórtice puro rotando estrictamente en el eje Y (X=0, Z=0)
+                float pSwirl = smoothstep(0.0, 1.0, uSwirl);
+                float angle = aCenter.y * 1.5 - (uTime * 3.0 + pSwirl * 25.0) + aRandom * 12.0;
+                float spiralRadius = mix(abs(aCenter.x), 9.0 * (0.2 + aRandom), pSwirl);
+                
+                float vortexX = cos(angle) * spiralRadius;
+                float vortexZ = sin(angle) * spiralRadius;
+                // Mantenemos la altura base pero permitimos un sutil movimiento orgánico en Y
+                float vortexY = mix(breakPos.y, aCenter.y * 1.1 + sin(uTime + aRandom * 5.0) * pSwirl * 2.0, pSwirl);
+
+                vec3 tornadoPos = vec3(vortexX, vortexY, vortexZ - (pSwirl * 8.0));
+                
+                vec3 finalPos = mix(breakPos, tornadoPos, pSwirl);
+
+                // Strike
+                float sForce = pow(uStrike, 4.0);
+                finalPos.z += sForce * 150.0;
+                finalPos.xy *= (1.0 + sForce * 30.0);
+
+                vGlow = uStrike;
+                vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
+                
+                // Rango sutil de polvo y micro-fragmentos
+                float baseSize = mix(1.2, 4.5, aRandom);
+                gl_PointSize = baseSize * (20.0 / -mvPosition.z);
+                
+                vParticleSize = aRandom; 
+                gl_Position = projectionMatrix * mvPosition;
+            }
+        `;
+
+        const particleFS = `
+            uniform sampler2D uTexture;
+            uniform float uAlpha;
+            uniform float uSwirl;
+            varying vec2 vUv;
+            varying float vGlow;
+            varying float vParticleSize;
+
+            void main() {
+                float dist = length(gl_PointCoord - 0.5);
+                if (dist > 0.5) discard;
+
+                // Gradiente súper suave, sin cortes ni bolas
+                float halo = pow(1.0 - (dist * 2.0), 1.8);
+
+                vec4 texColor = texture2D(uTexture, vUv);
+                
+                // Conservar texturas oscuras
+                if (texColor.a < 0.05 || dot(texColor.rgb, vec3(0.3, 0.59, 0.11)) < 0.01) discard;
+
+                vec3 cyan = vec3(0.0, 0.95, 1.0);
+                vec3 finalColor = mix(texColor.rgb, cyan, clamp((vGlow * 0.85) + (uSwirl * 0.25), 0.0, 1.0));
+                
+                float softAlpha = uAlpha * halo * (0.6 + vParticleSize * 0.4) * 1.5;
+                
+                gl_FragColor = vec4(finalColor, softAlpha);
+            }
+        `;
+
+        const lineVS = `
+            uniform float uViking, uStrike, uTime;
+            attribute vec3 aCenter;
+            attribute vec3 aTarget;
+            attribute float aRandom;
+            varying float vAlpha;
+
+            void main() {
+                // Posicion orbital dentro del volumen de gravedad del tornado
+                float angle = aCenter.y * 1.5 - (uTime * 3.0 + 25.0) + aRandom * 12.0;
+                float spiralRadius = 9.0 * (0.2 + aRandom);
+                
+                float vortexX = cos(angle) * spiralRadius;
+                float vortexZ = sin(angle) * spiralRadius;
+                float vortexY = aCenter.y * 1.1 + sin(uTime + aRandom * 5.0) * 2.0;
+
+                vec3 tornadoPos = vec3(vortexX, vortexY, vortexZ - 8.0);
+                
+                // Transición controlada hacia la figura determinística o asset
+                vec3 finalPos = mix(tornadoPos, aTarget, uViking);
+                
+                float sForce = pow(uStrike, 4.0);
+                finalPos.z += sForce * 150.0;
+                finalPos.xy *= (1.0 + sForce * 30.0);
+
+                vAlpha = 1.0 - sForce;
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(finalPos, 1.0);
             }
         `;
 
-        const fragmentShader = `
-            uniform sampler2D uTexture;
-            uniform float uViking, uStrike, uTime, uAlpha;
-            varying vec2 vUv;
-            varying float vEnergy;
+        const lineFS = `
+            uniform float uAlpha;
+            varying float vAlpha;
             void main() {
-                vec3 cyan = vec3(0.0, 0.95, 1.0);
-                vec4 color = texture2D(uTexture, vUv);
-                if(color.a < 0.1 || dot(color.rgb, vec3(0.3, 0.59, 0.11)) < 0.02) discard;
-                float pulse = sin(uTime * 20.0) * 0.15 + 0.85;
-                color.rgb = mix(color.rgb, cyan * pulse, vEnergy * 0.96);
-                color.rgb += uStrike * 0.85; 
-                float finalAlpha = uAlpha * (1.0 - smoothstep(0.99, 1.0, uStrike));
-                gl_FragColor = vec4(color.rgb, finalAlpha);
+                gl_FragColor = vec4(0.0, 0.95, 1.0, uAlpha * vAlpha * 2.0);
             }
         `;
 
-        function createCinematicSystem(texture) {
-            const aspect = texture.image ? texture.image.width / texture.image.height : 1;
-            const sharedUniforms = { uProgress: { value: 0 }, uViking: { value: 0 }, uStrike: { value: 0 }, uTime: { value: 0 }, uAlpha: { value: 1.0 } };
-            faceParticles = new THREE.Mesh(createParticleGeometry(15 * aspect, 15, 180, true), new THREE.ShaderMaterial({ uniforms: { ...sharedUniforms, uTexture: { value: texture }, uAlpha: { value: 1.0 } }, vertexShader, fragmentShader, transparent: true, side: THREE.DoubleSide }));
-            scene.add(faceParticles);
-            textParticles = new THREE.Mesh(createParticleGeometry(24, 12, 140, false), new THREE.ShaderMaterial({ uniforms: { ...sharedUniforms, uTexture: { value: createTextTexture() }, uAlpha: { value: 0.0 } }, vertexShader, fragmentShader, transparent: true, side: THREE.DoubleSide }));
-            textParticles.position.z = 2.0;
-            scene.add(textParticles);
-            setupCinematicTimeline(faceParticles.material, textParticles.material);
-        }
+        function createParticleGeometry(w, h, resW, resH) {
+            const geo = new THREE.BufferGeometry();
+            const count = resW * resH;
+            const positions = new Float32Array(count * 3);
+            const uvs = new Float32Array(count * 2);
+            const rands = new Float32Array(count);
+            const centers = new Float32Array(count * 3);
 
-        function createParticleGeometry(w, h, res, isViking) {
-            const geo = new THREE.PlaneGeometry(w, h, res, res).toNonIndexed();
-            const count = geo.attributes.position.count;
-            const randoms = new Float32Array(count), centers = new Float32Array(count * 3), targets = new Float32Array(count * 3);
-            for(let i = 0; i < count; i += 3) {
-                const r = Math.random(), cx = geo.attributes.position.getX(i), cy = geo.attributes.position.getY(i);
-                let tx = cx, ty = cy, tz = -5.0;
-                if(isViking) {
-                    if (r > 0.85) { tx = 6.5 + (Math.random() - 0.5) * 4.5; ty = 2.0 + (Math.random() - 0.5) * 6.0; tz = -2.5; }
-                    else if (r > 0.70) { tx = (Math.random() > 0.5 ? 1 : -1) * (4.0 + Math.random() * 5.0); ty = 8.5 + Math.random() * 5.0; }
-                    else { tx = (Math.random() - 0.5) * 12.0; ty = -3.0 + (Math.random() - 0.5) * 14.0; }
-                }
-                for(let j = 0; j < 3; j++) {
-                    randoms[i+j] = r; centers[(i+j)*3] = cx; centers[(i+j)*3+1] = cy; centers[(i+j)*3+2] = (Math.random()-0.5) * 6.0;
-                    targets[(i+j)*3] = tx; targets[(i+j)*3+1] = ty; targets[(i+j)*3+2] = tz;
+            for (let i = 0; i < resH; i++) {
+                for (let j = 0; j < resW; j++) {
+                    const idx = i * resW + j;
+                    const x = (j / resW - 0.5) * w;
+                    const y = (i / resH - 0.5) * h;
+                    positions[idx * 3] = x; positions[idx * 3 + 1] = y; positions[idx * 3 + 2] = 0;
+                    uvs[idx * 2] = j / resW; uvs[idx * 2 + 1] = i / resH;
+                    rands[idx] = Math.random();
+                    centers[idx * 3] = x; centers[idx * 3 + 1] = y; centers[idx * 3 + 2] = 0;
                 }
             }
-            geo.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1));
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+            geo.setAttribute('aRandom', new THREE.BufferAttribute(rands, 1));
             geo.setAttribute('aCenter', new THREE.BufferAttribute(centers, 3));
-            geo.setAttribute('aTarget', new THREE.BufferAttribute(targets, 3));
             return geo;
         }
 
-        function setupCinematicTimeline(faceMat, textMat) {
-            const masterTl = gsap.timeline({ scrollTrigger: { trigger: "#hero-master", start: "top top", endTrigger: "#scroll-engine", end: "bottom bottom", scrub: 1.2, pin: true, anticipatePin: 1, onLeave: () => document.getElementById('final-footer').classList.add('visible'), onEnterBack: () => document.getElementById('final-footer').classList.remove('visible') } });
-            const services = ["#s1", "#s2", "#s3", "#s4"];
-            gsap.set(services, { opacity: 0, scale: 0.7, y: 30 });
-            masterTl.to(textMat.uniforms.uAlpha, { value: 1.0, duration: 15 }, 0);
-            masterTl.to([faceMat.uniforms.uProgress, textMat.uniforms.uProgress], { value: 1.0, duration: 55 }, 15);
-            masterTl.to([faceMat.uniforms.uViking, textMat.uniforms.uViking], { value: 1.0, duration: 15 }, 70);
-            masterTl.to([faceMat.uniforms.uStrike, textMat.uniforms.uStrike], { value: 1.0, duration: 7, onStart: () => { gsap.fromTo("#impact-flash", { opacity: 1 }, { opacity: 0, duration: 1.2 }); gsap.fromTo(camera.position, { x: (Math.random()-0.5)*3.5, y: (Math.random()-0.5)*3.5 }, { x: 0, y: 0, duration: 0.7 }); } }, 85);
-            services.forEach((s, i) => masterTl.to(s, { opacity: 1, scale: 1, y: 0, duration: 8 }, 92 + i * 2));
+        function createEnergyLines() {
+            const numLines = 800; // Incrementado para mayor definición de la silueta
+            const geometry = new THREE.BufferGeometry();
+            const pos = new Float32Array(numLines * 6);
+            const centers = new Float32Array(numLines * 6);
+            const randoms = new Float32Array(numLines * 2);
+            const targets = new Float32Array(numLines * 6);
+
+            for(let i = 0; i < numLines; i++) {
+                const radius = 3 + Math.random() * 6;
+                const theta = Math.random() * Math.PI * 2;
+                const y = (Math.random() - 0.5) * 20;
+                
+                const x = Math.cos(theta) * radius;
+                const z = Math.sin(theta) * radius;
+                const rand = Math.random();
+                
+                pos[i*6] = x; pos[i*6+1] = y; pos[i*6+2] = z;
+                centers[i*6] = x; centers[i*6+1] = y; centers[i*6+2] = z;
+                randoms[i*2] = rand;
+                
+                pos[i*6+3] = x + (Math.random() - 0.5) * 2.0;
+                pos[i*6+4] = y + (Math.random() - 0.5) * 3.0;
+                pos[i*6+5] = z + (Math.random() - 0.5) * 2.0;
+                centers[i*6+3] = x; centers[i*6+4] = y; centers[i*6+5] = z;
+                randoms[i*2+1] = rand + 0.05;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            geometry.setAttribute('aCenter', new THREE.BufferAttribute(centers, 3));
+            geometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1));
+            
+            const targetAttribute = new THREE.BufferAttribute(targets, 3);
+            geometry.setAttribute('aTarget', targetAttribute);
+
+            createTargetParticlesFromImage('viking_target.png', numLines * 2, (loadedTargets) => {
+                for(let i=0; i < loadedTargets.length; i++) {
+                    targets[i] = loadedTargets[i];
+                }
+                targetAttribute.needsUpdate = true;
+            });
+
+            energyLines = new THREE.LineSegments(geometry, new THREE.ShaderMaterial({
+                uniforms: { uViking: {value:0}, uTime: {value:0}, uAlpha: {value:0}, uStrike: {value:0} },
+                vertexShader: lineVS, fragmentShader: lineFS, transparent: true, blending: THREE.AdditiveBlending
+            }));
+            
+            energyLines.visible = false;
+            scene.add(energyLines);
         }
 
-        function animate() { requestAnimationFrame(animate); const t = clock.getElapsedTime(); if(faceParticles) faceParticles.material.uniforms.uTime.value = t; if(textParticles) textParticles.material.uniforms.uTime.value = t; renderer.render(scene, camera); }
+        function syncHeroObjects() {
+            if (solidFace && facePoints) {
+                solidFace.position.set(0, 0, 0);
+                facePoints.position.set(0, 0, 0);
+                solidFace.rotation.set(0, 0, 0);
+                facePoints.rotation.set(0, 0, 0);
+                solidFace.scale.set(1, 1, 1);
+                facePoints.scale.set(1, 1, 1);
+            }
+            if (solidText && textPoints) {
+                solidText.position.set(0, 0, 2);
+                textPoints.position.set(0, 0, 2);
+                solidText.rotation.set(0, 0, 0);
+                textPoints.rotation.set(0, 0, 0);
+                solidText.scale.set(1, 1, 1);
+                textPoints.scale.set(1, 1, 1);
+            }
+        }
+
+        function createParticleSystem(texture) {
+            const aspect = texture.image ? texture.image.width / texture.image.height : 1;
+            
+            const solidFaceGeo = new THREE.PlaneGeometry(15 * aspect, 15);
+            const solidFaceMat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 1 });
+            solidFace = new THREE.Mesh(solidFaceGeo, solidFaceMat);
+            scene.add(solidFace);
+
+            const textTex = createTextTexture();
+            const solidTextGeo = new THREE.PlaneGeometry(24, 12);
+            const solidTextMat = new THREE.MeshBasicMaterial({ map: textTex, transparent: true, opacity: 1 }); // Comienza visible
+            solidText = new THREE.Mesh(solidTextGeo, solidTextMat);
+            scene.add(solidText);
+
+            // Aumento radical de partículas (300x300 = 90k para retrato, 300x150 = 45k para texto)
+            const matFace = new THREE.ShaderMaterial({
+                uniforms: { uTexture: { value: texture }, uBreak: { value: 0 }, uSwirl: { value: 0 }, uTime: { value: 0 }, uStrike: { value: 0 }, uAlpha: { value: 0 } },
+                vertexShader: particleVS, fragmentShader: particleFS, transparent: true, blending: THREE.AdditiveBlending
+            });
+            facePoints = new THREE.Points(createParticleGeometry(15 * aspect, 15, 300, 300), matFace);
+            scene.add(facePoints);
+
+            const matText = new THREE.ShaderMaterial({
+                uniforms: { uTexture: { value: textTex }, uBreak: { value: 0 }, uSwirl: { value: 0 }, uTime: { value: 0 }, uStrike: { value: 0 }, uAlpha: { value: 0 } },
+                vertexShader: particleVS, fragmentShader: particleFS, transparent: true, blending: THREE.AdditiveBlending
+            });
+            textPoints = new THREE.Points(createParticleGeometry(24, 12, 300, 150), matText);
+            scene.add(textPoints);
+
+            createEnergyLines();
+            syncHeroObjects();
+            setupTimeline();
+        }
+
+        function setupTimeline() {
+            masterTl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#hero-master", start: "top top", endTrigger: "#scroll-engine", end: "bottom bottom", scrub: 1.5, pin: true
+                }
+            });
+
+            const faceM = facePoints.material.uniforms;
+            const textM = textPoints.material.uniforms;
+            const lineM = energyLines.material.uniforms;
+
+            // 0 a 15: Hero limpio y título sólido
+            masterTl.to({}, { duration: 15 });
+
+            // 15 a 28: Micro fragmentación del retrato
+            masterTl.to(solidFace.material, { opacity: 0.0, duration: 3 }, 15);
+            masterTl.to(faceM.uAlpha, { value: 1.0, duration: 3 }, 15);
+            masterTl.to(faceM.uBreak, { value: 0.25, duration: 13, ease: "power1.out" }, 15);
+
+            // 24 a 38: Micro fragmentación del título VikingLatam
+            masterTl.to(solidText.material, { opacity: 0.0, duration: 3 }, 24);
+            masterTl.to(textM.uAlpha, { value: 1.0, duration: 3 }, 24);
+            masterTl.to(textM.uBreak, { value: 0.25, duration: 14, ease: "power1.out" }, 24);
+
+            // 28 a 55: Retrato y título entran juntos al remolino
+            masterTl.to(faceM.uSwirl, { value: 0.6, duration: 27, ease: "power2.inOut" }, 28);
+            masterTl.to(textM.uSwirl, { value: 0.6, duration: 27, ease: "power2.inOut" }, 28);
+
+            // 55 a 72: El remolino crece y acelera
+            masterTl.to(faceM.uSwirl, { value: 1.0, duration: 17, ease: "power1.inOut" }, 55);
+            masterTl.to(textM.uSwirl, { value: 1.0, duration: 17, ease: "power1.inOut" }, 55);
+
+            // 68 a 84: Aparecen líneas y vectores cian dentro del flujo
+            masterTl.set(energyLines, { visible: true }, 68);
+            masterTl.to(lineM.uAlpha, { value: 1.0, duration: 16, ease: "power2.out" }, 68);
+
+            // 80 a 92: Condensación hacia la silueta del vikingo con martillo
+            masterTl.to(lineM.uViking, { value: 1.0, duration: 12, ease: "power2.inOut" }, 80);
+
+            // 92 a 96: Golpe del martillo y flash
+            masterTl.to([faceM.uStrike, textM.uStrike, lineM.uStrike], { 
+                value: 1.0, duration: 4, ease: "expo.in",
+                onStart: () => {
+                    gsap.fromTo("#impact-flash", { opacity: 1 }, { opacity: 0, duration: 1.2 });
+                    gsap.fromTo(camera.position, { x: (Math.random()-0.5)*4, y: (Math.random()-0.5)*4 }, { x: 0, y: 0, duration: 0.6 });
+                }
+            }, 92);
+
+            // 96 a 100: Aparecen servicios
+            const services = ["#s1", "#s2", "#s3", "#s4"];
+            services.forEach((s, i) => {
+                masterTl.to(s, { opacity: 1, duration: 4 }, 96 + i * 0.5);
+            });
+            masterTl.to(lineM.uAlpha, { value: 0.1, duration: 4 }, 96);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const t = clock.getElapsedTime();
+            if(facePoints) facePoints.material.uniforms.uTime.value = t;
+            if(textPoints) textPoints.material.uniforms.uTime.value = t;
+            if(energyLines) energyLines.material.uniforms.uTime.value = t;
+            renderer.render(scene, camera);
+        }
         animate();
-        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight; 
+            camera.updateProjectionMatrix(); 
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            syncHeroObjects();
+        });
     </script>
 </body>
 </html>
