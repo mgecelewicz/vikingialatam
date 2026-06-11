@@ -3,354 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vikingia Latam — Experiencia Interactiva</title>
-    <!-- Tailwind CSS para Estilos Rápidos y Responsivos -->
+    <title>VIKINGIA LATAM</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configuración del tema oscuro e identidad de Vikingia -->
+    
+    <!-- Fuentes Google: Usando Montserrat para el estilo técnico y moderno de la imagen -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;800&display=swap" rel="stylesheet">
+
+    <!-- Configuración del Tema Tailwind (Basado en la imagen de referencia) -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            gold: '#D4AF37',
-                            dark: '#0A0A0A',
-                            accent: '#F39C12'
+                        viking: {
+                            gold: '#D4AF37', // Dorado principal
+                            goldLight: '#F3E5AB', // Dorado para texto brillante
+                            cyan: '#00E5FF',  // Cian Neón para el "IA"
+                            dark: '#030303',  // Fondo super oscuro
                         }
                     },
                     fontFamily: {
-                        sans: ['Cabinet Grotesk', 'Inter', 'sans-serif'],
+                        sans: ['Montserrat', 'sans-serif'],
+                    },
+                    letterSpacing: {
+                        'widest-xl': '0.3em',
                     }
                 }
             }
         }
     </script>
-    <!-- Estilos adicionales para fuentes y optimización del scroll scrollbar -->
     <style>
-        @import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,900&display=swap');
+        body { background-color: #030303; overflow-x: hidden; }
         
-        body {
-            background-color: #0A0A0A;
-            overflow-x: hidden;
+        /* Ocultar barra de scroll para inmersión total */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030303; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+        
+        /* Efecto de resplandor (Glow) para el texto IA */
+        .neon-text-cyan {
+            color: #00E5FF;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.7), 0 0 20px rgba(0, 229, 255, 0.5);
         }
 
-        /* Ocultar barra de scroll para una inmersión cinemática absoluta, manteniendo funcionalidad */
-        ::-webkit-scrollbar {
-            width: 8px;
+        /* Botón estilo "Ver Portfolio" de la imagen */
+        .btn-gold-outline {
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
         }
-        ::-webkit-scrollbar-track {
-            background: #0A0A0A;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #222;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #D4AF37;
-        }
-
-        /* Asegurar renderizado suave del video en Safari/iOS */
-        video::-webkit-media-controls {
-            display: none !important;
+        .btn-gold-outline:hover {
+            border-color: #D4AF37;
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
         }
     </style>
-    <!-- Librerías de Animación GSAP & ScrollTrigger -->
+    
+    <!-- GSAP & ScrollTrigger -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
-<body class="text-white selection:bg-brand-gold selection:text-black">
+<body class="text-white selection:bg-viking-gold selection:text-black font-sans">
 
-    <!-- Pantalla de Carga Cinematic / Loader -->
-    <div id="loader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black transition-all duration-1000">
-        <div class="relative flex flex-col items-center">
-            <!-- Símbolo minimalista Nórdico/Digital -->
-            <div class="w-16 h-16 border-2 border-brand-gold/20 border-t-brand-gold rounded-full animate-spin mb-6"></div>
-            <h2 class="text-2xl font-black tracking-widest uppercase text-white mb-2">VIKINGIA</h2>
-            <div class="w-48 h-[2px] bg-zinc-800 rounded-full overflow-hidden">
-                <div id="loader-progress" class="w-0 h-full bg-brand-gold transition-all duration-300 ease-out"></div>
-            </div>
-            <p id="loader-text" class="text-xs text-zinc-500 tracking-wider uppercase mt-3">Iniciando Experiencia... 0%</p>
+    <!-- Loader Ultra-Rápido (Protección anti-pantalla negra) -->
+    <div id="loader" class="fixed inset-0 z-50 flex items-center justify-center bg-black transition-opacity duration-700">
+        <div class="text-viking-gold text-sm tracking-widest-xl uppercase animate-pulse">
+            Iniciando...
         </div>
     </div>
 
-    <!-- NAVEGACIÓN HEADER -->
-    <header class="fixed top-0 left-0 w-full z-40 px-6 py-4 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent backdrop-blur-sm">
-        <div class="flex items-center space-x-2">
-            <span class="text-xl font-black tracking-tighter text-brand-gold">V</span>
-            <span class="text-xs font-mono tracking-widest text-zinc-400 uppercase hidden sm:inline-block">Vikingia Latam</span>
+    <!-- Navegación Minimalista -->
+    <header class="fixed top-0 left-0 w-full z-40 px-8 py-6 flex justify-between items-center mix-blend-difference">
+        <!-- Logo minimalista izquierdo (basado en la imagen) -->
+        <div class="text-viking-gold">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M4 6l8-4 8 4M4 12l8-4 8 4"/>
+            </svg>
         </div>
-        <nav class="hidden md:flex space-x-8 text-xs tracking-widest uppercase text-zinc-400 font-medium">
-            <a href="#" class="hover:text-brand-gold transition-colors">Inicio</a>
-            <a href="#post-hero" class="hover:text-brand-gold transition-colors">Manifiesto</a>
-            <a href="#post-hero" class="hover:text-brand-gold transition-colors">Portafolio</a>
-            <a href="#" class="hover:text-brand-gold transition-colors">Contacto</a>
+        <!-- Menú superior -->
+        <nav class="hidden md:flex space-x-10 text-[10px] tracking-widest-xl text-gray-300 uppercase font-medium">
+            <a href="#" class="text-viking-gold border-b border-viking-gold pb-1">Inicio</a>
+            <a href="#portfolio" class="hover:text-viking-gold transition-colors">Portfolio</a>
+            <a href="#" class="hover:text-viking-gold transition-colors">Servicios</a>
+            <a href="#" class="hover:text-viking-gold transition-colors">Sobre Mí</a>
+            <a href="#" class="hover:text-viking-gold transition-colors">Contacto</a>
         </nav>
-        <div>
-            <a href="#post-hero" class="px-4 py-2 border border-brand-gold/30 hover:border-brand-gold text-xs tracking-widest uppercase transition-all duration-300 hover:bg-brand-gold hover:text-black">
-                Explorar
-            </a>
-        </div>
+        <div class="w-6 hidden md:block"></div> <!-- Spacer -->
     </header>
 
-    <!-- SECTION 1: HERO SCROLL CONTAINER (Pinning Area) -->
-    <div id="hero-scroll-wrapper" class="relative w-full h-[400vh] bg-black">
+    <!-- SECTION 1: HERO SCROLL CONTAINER (Altura de scroll ajustada a 300vh para un scroll suave pero no eterno) -->
+    <div id="hero-scroll-wrapper" class="relative w-full h-[300vh] bg-black">
         
         <!-- Sticky viewport del Hero -->
-        <div class="sticky top-0 left-0 w-full h-screen overflow-hidden flex items-center justify-center">
+        <div class="sticky top-0 left-0 w-full h-screen overflow-hidden flex flex-col items-center justify-center">
             
-            <!-- Elemento de Video Principal (Scrubbeable) -->
+            <!-- VIDEO BASE (z-0) -->
             <video 
                 id="hero-video" 
-                class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-100"
+                class="absolute inset-0 w-full h-full object-cover z-0"
                 muted 
                 playsinline 
                 preload="auto"
-                style="will-change: transform, opacity;"
+                crossorigin="anonymous"
             >
                 <source src="https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/FINAL%20final.mp4" type="video/mp4">
-                Tu navegador no soporta reproducción de video.
             </video>
 
-            <!-- Imagen Puente del Frame Final (Previene parpadeo negro y suaviza transición a Seccion 2) -->
+            <!-- IMAGEN PUENTE (z-10) - Se superpone exactamente al video al final del scroll -->
             <img 
                 id="bridge-image" 
                 src="https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/hero-final-frame.jpeg" 
-                class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-0 mix-blend-normal z-10 transition-opacity duration-300"
-                alt="Vikingia Final Frame" 
+                class="absolute inset-0 w-full h-full object-cover z-10 opacity-0"
+                alt="Vikingia Frame" 
+                crossorigin="anonymous"
             />
 
-            <!-- Gradientes Estéticos de Profundidad -->
-            <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-brand-dark/90 pointer-events-none z-15"></div>
-            <div class="absolute inset-0 bg-radial-gradient from-transparent to-black/40 pointer-events-none z-15"></div>
+            <!-- OVERLAY DE GRADIENTE (z-20) - Para oscurecer los bordes y destacar el texto -->
+            <div class="absolute inset-0 bg-black/40 z-20 pointer-events-none"></div>
 
-            <!-- Contenido Tipográfico e Interacción Hero -->
-            <div id="hero-ui" class="absolute z-20 text-center px-4 max-w-5xl transition-transform duration-300 ease-out">
-                <span class="text-xs tracking-[0.5em] text-brand-gold font-mono uppercase mb-3 block">Digital Branding & Cinematic Art</span>
-                <h1 class="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter uppercase leading-none drop-shadow-2xl">
-                    VIKINGIA
-                </h1>
-                <p class="text-sm sm:text-lg md:text-xl font-light tracking-[0.25em] text-zinc-300 mt-4 max-w-2xl mx-auto drop-shadow-md">
-                    Diseño interactivo con legado nórdico para marcas del futuro.
-                </p>
-                <div class="mt-8 flex justify-center items-center space-x-2 text-zinc-500 text-xs tracking-widest uppercase">
-                    <span>Scroll para explorar</span>
-                    <span class="animate-bounce">↓</span>
-                </div>
-            </div>
-
-            <!-- Indicador lateral de progreso visual -->
-            <div class="absolute right-8 bottom-12 z-20 hidden md:flex flex-col items-end font-mono text-xs text-zinc-500 space-y-1">
-                <span class="text-brand-gold">AVANCE TIMELINE</span>
-                <span id="scroll-progress-label">0%</span>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- SECTION 2: POST-HERO (Transición Fluida) -->
-    <div id="post-hero" class="relative z-30 w-full min-h-screen bg-brand-dark text-white py-32 px-6 sm:px-12 md:px-24 border-t border-zinc-900 shadow-[0_-50px_100px_rgba(0,0,0,0.9)]">
-        <div class="max-w-6xl mx-auto">
-            
-            <!-- Encabezado de la Sección -->
-            <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-zinc-800/80 pb-12 mb-16">
-                <div>
-                    <span class="text-brand-gold font-mono tracking-widest text-sm uppercase block mb-2">Sección 02 / Manifiesto</span>
-                    <h2 class="text-4xl sm:text-6xl font-black tracking-tight uppercase leading-none">
-                        La Fusión del Acero <br>& la Interacción
-                    </h2>
-                </div>
-                <div class="mt-6 md:mt-0 max-w-md">
-                    <p class="text-zinc-400 text-sm md:text-base leading-relaxed">
-                        No creamos sitios estáticos, forjamos interfaces. La transición cinematográfica del Hero conecta la fuerza primitiva del video con la solidez de una navegación interactiva premium.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Grilla de Bloques de Contenido -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- CONTENIDO UI CENTRADO (z-30) - Tipografía y layout según la imagen enviada -->
+            <div class="hero-ui relative z-30 flex flex-col items-center text-center mt-12 w-full max-w-5xl px-4">
                 
-                <!-- Tarjeta 1 -->
-                <div class="group p-8 bg-zinc-950 border border-zinc-900 rounded-lg hover:border-brand-gold/30 transition-all duration-500 flex flex-col justify-between h-80">
-                    <div>
-                        <span class="font-mono text-xs text-zinc-600 block mb-6">01 / CONCEPT</span>
-                        <h3 class="text-xl font-bold uppercase tracking-tight text-white group-hover:text-brand-gold transition-colors mb-3">La Estética del Caos</h3>
-                        <p class="text-zinc-500 text-sm leading-relaxed">
-                            Diseño crudo, brutalista pero elegante. Un balance perfecto entre texturas cinemáticas oscuras e interacciones del más alto nivel técnico.
-                        </p>
-                    </div>
-                    <span class="text-brand-gold text-xs tracking-widest font-mono uppercase mt-4 block opacity-0 group-hover:opacity-100 transition-opacity">Saber más →</span>
-                </div>
+                <!-- Título Principal -->
+                <h1 class="text-5xl sm:text-7xl md:text-[5.5rem] font-bold tracking-widest text-viking-goldLight uppercase mb-6" style="text-shadow: 0 4px 20px rgba(0,0,0,0.8);">
+                    VIKING<span class="neon-text-cyan">IA</span>LATAM
+                </h1>
+                
+                <!-- Bajada -->
+                <p class="text-[10px] sm:text-xs md:text-sm tracking-[0.25em] md:tracking-[0.3em] text-gray-300 uppercase max-w-3xl leading-relaxed">
+                    Dirección creativa,<br class="md:hidden"> contenido visual y motion con IA
+                </p>
 
-                <!-- Tarjeta 2 -->
-                <div class="group p-8 bg-zinc-950 border border-zinc-900 rounded-lg hover:border-brand-gold/30 transition-all duration-500 flex flex-col justify-between h-80">
-                    <div>
-                        <span class="font-mono text-xs text-zinc-600 block mb-6">02 / TECHNOLOGY</span>
-                        <h3 class="text-xl font-bold uppercase tracking-tight text-white group-hover:text-brand-gold transition-colors mb-3">Rendimiento Sincronizado</h3>
-                        <p class="text-zinc-500 text-sm leading-relaxed">
-                            Control del framerate por hardware. Aprovechamos GSAP para decodificar y desplazar el video de forma nativa reduciendo la carga de CPU y GPU.
-                        </p>
-                    </div>
-                    <span class="text-brand-gold text-xs tracking-widest font-mono uppercase mt-4 block opacity-0 group-hover:opacity-100 transition-opacity">Saber más →</span>
-                </div>
-
-                <!-- Tarjeta 3 -->
-                <div class="group p-8 bg-zinc-950 border border-zinc-900 rounded-lg hover:border-brand-gold/30 transition-all duration-500 flex flex-col justify-between h-80">
-                    <div>
-                        <span class="font-mono text-xs text-zinc-600 block mb-6">03 / TRANSITION</span>
-                        <h3 class="text-xl font-bold uppercase tracking-tight text-white group-hover:text-brand-gold transition-colors mb-3">La Imagen Puente</h3>
-                        <p class="text-zinc-500 text-sm leading-relaxed">
-                            A través de nuestro sistema de puente estático, logramos que el usuario pase de interactuar con el video de scroll a leer el contenido sin saltos bruscos.
-                        </p>
-                    </div>
-                    <span class="text-brand-gold text-xs tracking-widest font-mono uppercase mt-4 block opacity-0 group-hover:opacity-100 transition-opacity">Saber más →</span>
-                </div>
-
-            </div>
-
-            <!-- Footer Informativo -->
-            <div class="mt-24 pt-8 border-t border-zinc-900 text-center text-xs text-zinc-600 font-mono flex flex-col sm:flex-row justify-between items-center gap-4">
-                <p>© 2026 VIKINGIA LATAM. Todos los derechos reservados.</p>
-                <div class="flex space-x-6">
-                    <span class="text-zinc-500">Asset: FINAL final.mp4 (Cargado)</span>
-                    <span class="text-zinc-500">Asset: hero-final-frame.jpeg (Preparado)</span>
+                <!-- Botón -->
+                <a href="#portfolio" class="mt-12 px-8 py-3 rounded-full btn-gold-outline text-xs tracking-widest uppercase flex items-center gap-3 text-viking-goldLight group">
+                    Ver Portfolio
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </a>
+                
+                <!-- Indicador de Scroll -->
+                <div class="absolute -bottom-32 flex flex-col items-center gap-2 text-gray-500 opacity-60">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 4v16m0 0l-4-4m4 4l4-4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="text-[9px] tracking-widest-xl uppercase">Desliza para explorar</span>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- LÓGICA DE CONTROL DE INTERACCIÓN, SCROLL Y CARGA -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Registro de plugin GSAP indispensable
-            gsap.registerPlugin(ScrollTrigger);
+    <!-- SECTION 2: PORTFOLIO (Inicio para probar continuidad de la imagen puente) -->
+    <div id="portfolio" class="relative z-40 w-full min-h-screen bg-viking-dark text-white py-24">
+        <!-- Contenido de prueba solo para asegurar que el scroll sigue fluidamente debajo de la imagen puente -->
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <h2 class="text-sm tracking-widest text-viking-gold uppercase mb-2">Continuidad Verificada</h2>
+            <p class="text-gray-500 max-w-xl mx-auto">La imagen puente (hero-final-frame.jpeg) quedó anclada en el fondo del Hero. Aquí comenzará el armado del portfolio.</p>
+        </div>
+    </div>
 
+    <script>
+        // Registrar ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        document.addEventListener("DOMContentLoaded", () => {
             const video = document.getElementById("hero-video");
             const bridgeImg = document.getElementById("bridge-image");
-            const heroWrapper = document.getElementById("hero-scroll-wrapper");
             const loader = document.getElementById("loader");
-            const loaderProgress = document.getElementById("loader-progress");
-            const loaderText = document.getElementById("loader-text");
-            const heroUi = document.getElementById("hero-ui");
-            const progressLabel = document.getElementById("scroll-progress-label");
-
-            let videoDuration = 0;
-
-            // 1. CONTROL DE LA CARGA DE ASSETS (VIDEO & IMAGEN PUENTE)
-            // Para asegurar un scroll suave inicial, forzamos la precarga y leemos metadata
-            let assetsLoaded = 0;
-            const totalAssets = 2;
-
-            function assetItemLoaded() {
-                assetsLoaded++;
-                const percent = Math.floor((assetsLoaded / totalAssets) * 100);
-                loaderProgress.style.width = percent + "%";
-                loaderText.innerText = `Cargando Experiencia... ${percent}%`;
-
-                if (assetsLoaded >= totalAssets) {
-                    setTimeout(initializeScrollInteractions, 600);
-                }
-            }
-
-            // Precarga de la Imagen Puente
-            const tempImg = new Image();
-            tempImg.src = bridgeImg.src;
-            tempImg.onload = () => {
-                assetItemLoaded();
-            };
-            tempImg.onerror = () => {
-                // Prevenir bloqueo si la imagen de GitHub falla temporalmente
-                console.warn("Fallo carga de imagen puente. Usando fallback.");
-                assetItemLoaded();
+            
+            // DIAGNÓSTICO/FIX 1: Loader Anti-bloqueos
+            // No esperamos eternamente al video. Si en 1.5 segundos no está, forzamos inicio.
+            // Esto arregla el preview roto en Canvas/Iframes.
+            let isLoaded = false;
+            
+            const startExperience = () => {
+                if (isLoaded) return;
+                isLoaded = true;
+                loader.classList.add("opacity-0");
+                setTimeout(() => loader.style.display = "none", 700);
+                initScrollAnimations();
             };
 
-            // Precarga y metadata de Video
-            // Comprobamos si el video ya está listo o escuchamos el evento
-            if (video.readyState >= 1) {
-                videoDuration = video.duration || 6; // Fallback promedio en segundos
-                assetItemLoaded();
-            } else {
-                video.addEventListener("loadedmetadata", () => {
-                    videoDuration = video.duration || 6;
-                    assetItemLoaded();
-                });
-                
-                // Evento canplaythrough asegura que el buffer no haga stutter
-                video.addEventListener("canplaythrough", () => {
-                    if (videoDuration === 0) videoDuration = video.duration;
-                });
-            }
+            // Intentar leer el video, pero con un timeout estricto
+            video.addEventListener("loadedmetadata", startExperience);
+            video.addEventListener("canplaythrough", startExperience);
+            setTimeout(startExperience, 1500); // Override de seguridad garantizado
 
-            // Fallback de seguridad por si el navegador bloquea carga del video
-            setTimeout(() => {
-                if (assetsLoaded < totalAssets) {
-                    videoDuration = video.duration || 6;
-                    // Forzar finalización de pantalla de carga
-                    loaderProgress.style.width = "100%";
-                    loaderText.innerText = "Listo.";
-                    initializeScrollInteractions();
-                }
-            }, 5000);
+            // LÓGICA DE SCROLL Y CONTINUIDAD (Objetivo 2)
+            function initScrollAnimations() {
+                // Duración base (si el video falla por CORS, usamos 6 segundos como base del timeline)
+                let duration = video.duration && !isNaN(video.duration) ? video.duration : 6;
+                let videoObj = { time: 0 };
 
-            // 2. CONFIGURACIÓN DEL SCROLLTRIGGER E INTERACCIONES
-            function initializeScrollInteractions() {
-                // Esconder Loader con transición cinemática
-                loader.classList.add("opacity-0", "pointer-events-none");
-
-                // Configurar currentTime inicial del video para evitar frame inicial negro
-                video.currentTime = 0;
-
-                // Timeline de GSAP sincronizado al scroll del Hero Container
+                // Timeline principal atado al scroll
                 const tl = gsap.timeline({
                     scrollTrigger: {
-                        trigger: heroWrapper,
+                        trigger: "#hero-scroll-wrapper",
                         start: "top top",
                         end: "bottom bottom",
-                        scrub: 1, // Duración del suavizado del scroll-scrubbing
-                        pin: true, // Bloquea el viewport del video mientras scrollas
-                        anticipatePin: 1,
-                        onUpdate: (self) => {
-                            // Actualizar label de progreso lateral
-                            const progressPercent = Math.floor(self.progress * 100);
-                            progressLabel.innerText = `${progressPercent}%`;
-
-                            // CONTROL DE LA IMAGEN PUENTE (Fusión anti-flicker)
-                            // A partir de 94% del scroll, desvanecemos el video y mostramos la imagen puente
-                            if (self.progress >= 0.94) {
-                                // Fade-in ultra suave de la imagen estática idéntica al frame final
-                                bridgeImg.style.opacity = "1";
-                                video.style.opacity = "0";
-                            } else {
-                                // Devolver protagonismo al video interactivo
-                                bridgeImg.style.opacity = "0";
-                                video.style.opacity = "1";
-                            }
-                        }
+                        scrub: 1, // Suavizado de 1 segundo para evitar saltos bruscos
+                        pin: true, // Fija el contenedor
                     }
                 });
 
-                // Objeto dummy para interpolar el tiempo de forma suave con GSAP
-                const videoTimelineObject = { currentTime: 0 };
-
-                // Animamos la propiedad dummy de 0 a la duración total del video
-                tl.to(videoTimelineObject, {
-                    currentTime: videoDuration - 0.05, // Sutil offset para no saltar al final absoluto
-                    ease: "none",
-                    onUpdate: () => {
-                        // Forzamos al elemento de video a ir al frame preciso calculado por el scroll
-                        if (video.readyState >= 2) {
-                            video.currentTime = videoTimelineObject.currentTime;
-                        }
-                    }
-                }, 0);
-
-                // Animación paralela del UI de cabecera (difuminar y desplazar texto al scrollar)
-                tl.to(heroUi, {
-                    y: -100,
+                // 1. Ocultar textos hacia arriba mientras scrolleamos
+                tl.to(".hero-ui", {
+                    y: -150,
                     opacity: 0,
-                    scale: 0.95,
-                    ease: "none"
+                    duration: duration * 0.4, // Desaparece a la mitad del scroll
+                    ease: "power2.out"
                 }, 0);
+
+                // 2. Scrub del video (Solo si el video cargó correctamente)
+                if (video.readyState >= 1) {
+                    tl.to(videoObj, {
+                        time: duration - 0.1, // No llegamos al 100% exacto para evitar loop al inicio
+                        duration: duration,
+                        ease: "none",
+                        onUpdate: () => {
+                            video.currentTime = videoObj.time;
+                        }
+                    }, 0);
+                }
+
+                // DIAGNÓSTICO/FIX 2: Continuidad perfecta.
+                // La imagen puente se desvanece (fade in) sobre el video EXACTAMENTE en el último 10% del scroll.
+                // Como es exactamente el mismo frame, es indetectable, no hay salto negro.
+                tl.to(bridgeImg, {
+                    opacity: 1,
+                    duration: duration * 0.1, // Transición rápida al final
+                    ease: "power1.inOut"
+                }, duration * 0.9); // Inicia en el 90% del timeline
             }
         });
     </script>
