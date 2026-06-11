@@ -1,135 +1,358 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VikingIALatam - Experiencia Inmersiva</title>
-    <style>
-        body { margin: 0; background: #000; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
-        #hero-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-        #post-hero-ui { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            display: flex; align-items: center; padding-left: 10%; z-index: 2;
-            pointer-events: none; opacity: 0; transition: opacity 0.8s ease-out;
-        }
-        .text-content { max-width: 450px; }
-        h1 { font-size: 3.5rem; color: #fff; text-transform: uppercase; margin-bottom: 20px; line-height: 1.1; font-weight: 900; }
-        .ia-text { color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.6); }
-        p { color: #ccc; margin-bottom: 35px; font-size: 1.2rem; font-weight: 300; line-height: 1.4; }
-        .btn-cta { 
-            padding: 16px 36px; border: 2px solid #ffd700; background: transparent; 
-            color: #fff; text-transform: uppercase; cursor: pointer; font-weight: 700; letter-spacing: 1px;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); transition: all 0.3s ease; border-radius: 4px;
-        }
-        .btn-cta:hover { background: rgba(255, 215, 0, 0.1); box-shadow: 0 0 25px rgba(255, 215, 0, 0.5); transform: translateY(-2px); }
-        #loader { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; color: #fff; }
-        .loader-spinner { width: 40px; height: 40px; border: 3px solid #333; border-top: 3px solid #ff9900; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .scroll-runway { height: 600vh; width: 100%; }
-        #start-btn { margin-top: 25px; padding: 16px 32px; background: #ff9900; color: #000; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; display: none; }
-    </style>
-</head>
-<body>
-    <div id="loader">
-        <div class="loader-spinner"></div>
-        <p id="status">Conectando con la nube...</p>
-        <button id="start-btn">Iniciar Experiencia</button>
-    </div>
-    <section id="post-hero-ui">
-        <div class="text-content">
-            <h1>VIKINGI<span class="ia-text">ALATAM</span></h1>
-            <p>Dirección creativa, contenido visual y motion con IA</p>
-            <button class="btn-cta">Ver portfolio</button>
-        </div>
-    </section>
-    <canvas id="hero-canvas"></canvas>
-    <video id="video" crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/mgecelewicz/vikingialatam@main/933132874_1781180361781745.mp4" muted playsinline preload="auto" style="display:none"></video>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vikingia Latam — Experiencia Interactiva</title>
+    <!-- Tailwind CSS para Estilos Rápidos y Responsivos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuración del tema oscuro e identidad de Vikingia -->
     <script>
-        const video = document.getElementById("video");
-        const canvas = document.getElementById("hero-canvas");
-        const ctx = canvas.getContext("2d");
-        const loader = document.getElementById("loader");
-        const status = document.getElementById("status");
-        const startBtn = document.getElementById("start-btn");
-        const frames = [];
-        function resize() {
-            canvas.width = window.innerWidth * window.devicePixelRatio;
-            canvas.height = window.innerHeight * window.devicePixelRatio;
-            if(frames.length > 0) {
-                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-                const scrollPercent = Math.max(0, Math.min(window.scrollY / maxScroll, 1));
-                const index = Math.floor(scrollPercent * (frames.length - 1));
-                drawFrame(index);
-            }
-        }
-        window.addEventListener('resize', resize);
-        resize();
-        async function processVideo() {
-            status.textContent = "Procesando video...";
-            const totalFrames = 60; 
-            for (let i = 0; i < totalFrames; i++) {
-                const targetTime = (i / totalFrames) * video.duration;
-                if (video.currentTime !== targetTime) {
-                    await new Promise(resolve => {
-                        const onSeeked = () => {
-                            video.removeEventListener('seeked', onSeeked);
-                            resolve();
-                        };
-                        video.addEventListener('seeked', onSeeked);
-                        video.currentTime = targetTime;
-                    });
-                }
-                try {
-                    frames.push(await createImageBitmap(video));
-                    status.textContent = `Preparando experiencia: ${Math.round((i/totalFrames)*100)}%`;
-                } catch(e) {
-                    console.error("Error decodificando frame:", e);
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#D4AF37',
+                            dark: '#0A0A0A',
+                            accent: '#F39C12'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Cabinet Grotesk', 'Inter', 'sans-serif'],
+                    }
                 }
             }
-            loader.style.opacity = '0';
-            setTimeout(() => loader.style.display = 'none', 500);
-            if(frames.length > 0) drawFrame(0);
         }
-        function drawFrame(index) {
-            const frame = frames[index];
-            if(!frame) return;
-            const ratio = Math.max(canvas.width / frame.width, canvas.height / frame.height);
-            const w = frame.width * ratio;
-            const h = frame.height * ratio;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(frame, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
-        }
-        video.addEventListener('loadedmetadata', async () => {
-            try {
-                await processVideo();
-            } catch(e) {
-                status.textContent = "El navegador requiere interacción táctil";
-                startBtn.style.display = 'block';
-            }
-        });
-        startBtn.onclick = async () => {
-            startBtn.style.display = 'none';
-            video.load();
-            await processVideo();
-        };
-        video.onerror = () => status.textContent = "Error de red al conectar con GitHub.";
-        window.addEventListener('scroll', () => {
-            if (frames.length === 0) return;
-            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPercent = Math.max(0, Math.min(window.scrollY / maxScroll, 1));
-            const index = Math.floor(scrollPercent * (frames.length - 1));
-            drawFrame(index);
-            const ui = document.getElementById('post-hero-ui');
-            if (scrollPercent > 0.90) {
-                ui.style.opacity = '1';
-                ui.style.pointerEvents = 'auto';
-            } else {
-                ui.style.opacity = '0';
-                ui.style.pointerEvents = 'none';
-            }
-        });
-        video.load();
     </script>
-    <div class="scroll-runway"></div>
+    <!-- Estilos adicionales para fuentes y optimización del scroll scrollbar -->
+    <style>
+        @import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,900&display=swap');
+        
+        body {
+            background-color: #0A0A0A;
+            overflow-x: hidden;
+        }
+
+        /* Ocultar barra de scroll para una inmersión cinemática absoluta, manteniendo funcionalidad */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0A0A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D4AF37;
+        }
+
+        /* Asegurar renderizado suave del video en Safari/iOS */
+        video::-webkit-media-controls {
+            display: none !important;
+        }
+    </style>
+    <!-- Librerías de Animación GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+</head>
+<body class="text-white selection:bg-brand-gold selection:text-black">
+
+    <!-- Pantalla de Carga Cinematic / Loader -->
+    <div id="loader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black transition-all duration-1000">
+        <div class="relative flex flex-col items-center">
+            <!-- Símbolo minimalista Nórdico/Digital -->
+            <div class="w-16 h-16 border-2 border-brand-gold/20 border-t-brand-gold rounded-full animate-spin mb-6"></div>
+            <h2 class="text-2xl font-black tracking-widest uppercase text-white mb-2">VIKINGIA</h2>
+            <div class="w-48 h-[2px] bg-zinc-800 rounded-full overflow-hidden">
+                <div id="loader-progress" class="w-0 h-full bg-brand-gold transition-all duration-300 ease-out"></div>
+            </div>
+            <p id="loader-text" class="text-xs text-zinc-500 tracking-wider uppercase mt-3">Iniciando Experiencia... 0%</p>
+        </div>
+    </div>
+
+    <!-- NAVEGACIÓN HEADER -->
+    <header class="fixed top-0 left-0 w-full z-40 px-6 py-4 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent backdrop-blur-sm">
+        <div class="flex items-center space-x-2">
+            <span class="text-xl font-black tracking-tighter text-brand-gold">V</span>
+            <span class="text-xs font-mono tracking-widest text-zinc-400 uppercase hidden sm:inline-block">Vikingia Latam</span>
+        </div>
+        <nav class="hidden md:flex space-x-8 text-xs tracking-widest uppercase text-zinc-400 font-medium">
+            <a href="#" class="hover:text-brand-gold transition-colors">Inicio</a>
+            <a href="#post-hero" class="hover:text-brand-gold transition-colors">Manifiesto</a>
+            <a href="#post-hero" class="hover:text-brand-gold transition-colors">Portafolio</a>
+            <a href="#" class="hover:text-brand-gold transition-colors">Contacto</a>
+        </nav>
+        <div>
+            <a href="#post-hero" class="px-4 py-2 border border-brand-gold/30 hover:border-brand-gold text-xs tracking-widest uppercase transition-all duration-300 hover:bg-brand-gold hover:text-black">
+                Explorar
+            </a>
+        </div>
+    </header>
+
+    <!-- SECTION 1: HERO SCROLL CONTAINER (Pinning Area) -->
+    <div id="hero-scroll-wrapper" class="relative w-full h-[400vh] bg-black">
+        
+        <!-- Sticky viewport del Hero -->
+        <div class="sticky top-0 left-0 w-full h-screen overflow-hidden flex items-center justify-center">
+            
+            <!-- Elemento de Video Principal (Scrubbeable) -->
+            <video 
+                id="hero-video" 
+                class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-100"
+                muted 
+                playsinline 
+                preload="auto"
+                style="will-change: transform, opacity;"
+            >
+                <source src="https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/FINAL%20final.mp4" type="video/mp4">
+                Tu navegador no soporta reproducción de video.
+            </video>
+
+            <!-- Imagen Puente del Frame Final (Previene parpadeo negro y suaviza transición a Seccion 2) -->
+            <img 
+                id="bridge-image" 
+                src="https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/hero-final-frame.jpeg" 
+                class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-0 mix-blend-normal z-10 transition-opacity duration-300"
+                alt="Vikingia Final Frame" 
+            />
+
+            <!-- Gradientes Estéticos de Profundidad -->
+            <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-brand-dark/90 pointer-events-none z-15"></div>
+            <div class="absolute inset-0 bg-radial-gradient from-transparent to-black/40 pointer-events-none z-15"></div>
+
+            <!-- Contenido Tipográfico e Interacción Hero -->
+            <div id="hero-ui" class="absolute z-20 text-center px-4 max-w-5xl transition-transform duration-300 ease-out">
+                <span class="text-xs tracking-[0.5em] text-brand-gold font-mono uppercase mb-3 block">Digital Branding & Cinematic Art</span>
+                <h1 class="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter uppercase leading-none drop-shadow-2xl">
+                    VIKINGIA
+                </h1>
+                <p class="text-sm sm:text-lg md:text-xl font-light tracking-[0.25em] text-zinc-300 mt-4 max-w-2xl mx-auto drop-shadow-md">
+                    Diseño interactivo con legado nórdico para marcas del futuro.
+                </p>
+                <div class="mt-8 flex justify-center items-center space-x-2 text-zinc-500 text-xs tracking-widest uppercase">
+                    <span>Scroll para explorar</span>
+                    <span class="animate-bounce">↓</span>
+                </div>
+            </div>
+
+            <!-- Indicador lateral de progreso visual -->
+            <div class="absolute right-8 bottom-12 z-20 hidden md:flex flex-col items-end font-mono text-xs text-zinc-500 space-y-1">
+                <span class="text-brand-gold">AVANCE TIMELINE</span>
+                <span id="scroll-progress-label">0%</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SECTION 2: POST-HERO (Transición Fluida) -->
+    <div id="post-hero" class="relative z-30 w-full min-h-screen bg-brand-dark text-white py-32 px-6 sm:px-12 md:px-24 border-t border-zinc-900 shadow-[0_-50px_100px_rgba(0,0,0,0.9)]">
+        <div class="max-w-6xl mx-auto">
+            
+            <!-- Encabezado de la Sección -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-zinc-800/80 pb-12 mb-16">
+                <div>
+                    <span class="text-brand-gold font-mono tracking-widest text-sm uppercase block mb-2">Sección 02 / Manifiesto</span>
+                    <h2 class="text-4xl sm:text-6xl font-black tracking-tight uppercase leading-none">
+                        La Fusión del Acero <br>& la Interacción
+                    </h2>
+                </div>
+                <div class="mt-6 md:mt-0 max-w-md">
+                    <p class="text-zinc-400 text-sm md:text-base leading-relaxed">
+                        No creamos sitios estáticos, forjamos interfaces. La transición cinematográfica del Hero conecta la fuerza primitiva del video con la solidez de una navegación interactiva premium.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Grilla de Bloques de Contenido -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <!-- Tarjeta 1 -->
+                <div class="group p-8 bg-zinc-950 border border-zinc-900 rounded-lg hover:border-brand-gold/30 transition-all duration-500 flex flex-col justify-between h-80">
+                    <div>
+                        <span class="font-mono text-xs text-zinc-600 block mb-6">01 / CONCEPT</span>
+                        <h3 class="text-xl font-bold uppercase tracking-tight text-white group-hover:text-brand-gold transition-colors mb-3">La Estética del Caos</h3>
+                        <p class="text-zinc-500 text-sm leading-relaxed">
+                            Diseño crudo, brutalista pero elegante. Un balance perfecto entre texturas cinemáticas oscuras e interacciones del más alto nivel técnico.
+                        </p>
+                    </div>
+                    <span class="text-brand-gold text-xs tracking-widest font-mono uppercase mt-4 block opacity-0 group-hover:opacity-100 transition-opacity">Saber más →</span>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div class="group p-8 bg-zinc-950 border border-zinc-900 rounded-lg hover:border-brand-gold/30 transition-all duration-500 flex flex-col justify-between h-80">
+                    <div>
+                        <span class="font-mono text-xs text-zinc-600 block mb-6">02 / TECHNOLOGY</span>
+                        <h3 class="text-xl font-bold uppercase tracking-tight text-white group-hover:text-brand-gold transition-colors mb-3">Rendimiento Sincronizado</h3>
+                        <p class="text-zinc-500 text-sm leading-relaxed">
+                            Control del framerate por hardware. Aprovechamos GSAP para decodificar y desplazar el video de forma nativa reduciendo la carga de CPU y GPU.
+                        </p>
+                    </div>
+                    <span class="text-brand-gold text-xs tracking-widest font-mono uppercase mt-4 block opacity-0 group-hover:opacity-100 transition-opacity">Saber más →</span>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div class="group p-8 bg-zinc-950 border border-zinc-900 rounded-lg hover:border-brand-gold/30 transition-all duration-500 flex flex-col justify-between h-80">
+                    <div>
+                        <span class="font-mono text-xs text-zinc-600 block mb-6">03 / TRANSITION</span>
+                        <h3 class="text-xl font-bold uppercase tracking-tight text-white group-hover:text-brand-gold transition-colors mb-3">La Imagen Puente</h3>
+                        <p class="text-zinc-500 text-sm leading-relaxed">
+                            A través de nuestro sistema de puente estático, logramos que el usuario pase de interactuar con el video de scroll a leer el contenido sin saltos bruscos.
+                        </p>
+                    </div>
+                    <span class="text-brand-gold text-xs tracking-widest font-mono uppercase mt-4 block opacity-0 group-hover:opacity-100 transition-opacity">Saber más →</span>
+                </div>
+
+            </div>
+
+            <!-- Footer Informativo -->
+            <div class="mt-24 pt-8 border-t border-zinc-900 text-center text-xs text-zinc-600 font-mono flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p>© 2026 VIKINGIA LATAM. Todos los derechos reservados.</p>
+                <div class="flex space-x-6">
+                    <span class="text-zinc-500">Asset: FINAL final.mp4 (Cargado)</span>
+                    <span class="text-zinc-500">Asset: hero-final-frame.jpeg (Preparado)</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- LÓGICA DE CONTROL DE INTERACCIÓN, SCROLL Y CARGA -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Registro de plugin GSAP indispensable
+            gsap.registerPlugin(ScrollTrigger);
+
+            const video = document.getElementById("hero-video");
+            const bridgeImg = document.getElementById("bridge-image");
+            const heroWrapper = document.getElementById("hero-scroll-wrapper");
+            const loader = document.getElementById("loader");
+            const loaderProgress = document.getElementById("loader-progress");
+            const loaderText = document.getElementById("loader-text");
+            const heroUi = document.getElementById("hero-ui");
+            const progressLabel = document.getElementById("scroll-progress-label");
+
+            let videoDuration = 0;
+
+            // 1. CONTROL DE LA CARGA DE ASSETS (VIDEO & IMAGEN PUENTE)
+            // Para asegurar un scroll suave inicial, forzamos la precarga y leemos metadata
+            let assetsLoaded = 0;
+            const totalAssets = 2;
+
+            function assetItemLoaded() {
+                assetsLoaded++;
+                const percent = Math.floor((assetsLoaded / totalAssets) * 100);
+                loaderProgress.style.width = percent + "%";
+                loaderText.innerText = `Cargando Experiencia... ${percent}%`;
+
+                if (assetsLoaded >= totalAssets) {
+                    setTimeout(initializeScrollInteractions, 600);
+                }
+            }
+
+            // Precarga de la Imagen Puente
+            const tempImg = new Image();
+            tempImg.src = bridgeImg.src;
+            tempImg.onload = () => {
+                assetItemLoaded();
+            };
+            tempImg.onerror = () => {
+                // Prevenir bloqueo si la imagen de GitHub falla temporalmente
+                console.warn("Fallo carga de imagen puente. Usando fallback.");
+                assetItemLoaded();
+            };
+
+            // Precarga y metadata de Video
+            // Comprobamos si el video ya está listo o escuchamos el evento
+            if (video.readyState >= 1) {
+                videoDuration = video.duration || 6; // Fallback promedio en segundos
+                assetItemLoaded();
+            } else {
+                video.addEventListener("loadedmetadata", () => {
+                    videoDuration = video.duration || 6;
+                    assetItemLoaded();
+                });
+                
+                // Evento canplaythrough asegura que el buffer no haga stutter
+                video.addEventListener("canplaythrough", () => {
+                    if (videoDuration === 0) videoDuration = video.duration;
+                });
+            }
+
+            // Fallback de seguridad por si el navegador bloquea carga del video
+            setTimeout(() => {
+                if (assetsLoaded < totalAssets) {
+                    videoDuration = video.duration || 6;
+                    // Forzar finalización de pantalla de carga
+                    loaderProgress.style.width = "100%";
+                    loaderText.innerText = "Listo.";
+                    initializeScrollInteractions();
+                }
+            }, 5000);
+
+            // 2. CONFIGURACIÓN DEL SCROLLTRIGGER E INTERACCIONES
+            function initializeScrollInteractions() {
+                // Esconder Loader con transición cinemática
+                loader.classList.add("opacity-0", "pointer-events-none");
+
+                // Configurar currentTime inicial del video para evitar frame inicial negro
+                video.currentTime = 0;
+
+                // Timeline de GSAP sincronizado al scroll del Hero Container
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: heroWrapper,
+                        start: "top top",
+                        end: "bottom bottom",
+                        scrub: 1, // Duración del suavizado del scroll-scrubbing
+                        pin: true, // Bloquea el viewport del video mientras scrollas
+                        anticipatePin: 1,
+                        onUpdate: (self) => {
+                            // Actualizar label de progreso lateral
+                            const progressPercent = Math.floor(self.progress * 100);
+                            progressLabel.innerText = `${progressPercent}%`;
+
+                            // CONTROL DE LA IMAGEN PUENTE (Fusión anti-flicker)
+                            // A partir de 94% del scroll, desvanecemos el video y mostramos la imagen puente
+                            if (self.progress >= 0.94) {
+                                // Fade-in ultra suave de la imagen estática idéntica al frame final
+                                bridgeImg.style.opacity = "1";
+                                video.style.opacity = "0";
+                            } else {
+                                // Devolver protagonismo al video interactivo
+                                bridgeImg.style.opacity = "0";
+                                video.style.opacity = "1";
+                            }
+                        }
+                    }
+                });
+
+                // Objeto dummy para interpolar el tiempo de forma suave con GSAP
+                const videoTimelineObject = { currentTime: 0 };
+
+                // Animamos la propiedad dummy de 0 a la duración total del video
+                tl.to(videoTimelineObject, {
+                    currentTime: videoDuration - 0.05, // Sutil offset para no saltar al final absoluto
+                    ease: "none",
+                    onUpdate: () => {
+                        // Forzamos al elemento de video a ir al frame preciso calculado por el scroll
+                        if (video.readyState >= 2) {
+                            video.currentTime = videoTimelineObject.currentTime;
+                        }
+                    }
+                }, 0);
+
+                // Animación paralela del UI de cabecera (difuminar y desplazar texto al scrollar)
+                tl.to(heroUi, {
+                    y: -100,
+                    opacity: 0,
+                    scale: 0.95,
+                    ease: "none"
+                }, 0);
+            }
+        });
+    </script>
 </body>
 </html>
