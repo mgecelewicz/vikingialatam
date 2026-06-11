@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VikingIALatam - Experiencia Inmersiva</title>
+    <style>
+        body { margin: 0; background: #000; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+        #hero-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        #post-hero-ui { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            display: flex; align-items: center; padding-left: 10%; z-index: 2;
+            pointer-events: none; opacity: 0; transition: opacity 0.8s ease-out;
+        }
+        .text-content { max-width: 450px; }
+        h1 { font-size: 3.5rem; color: #fff; text-transform: uppercase; margin-bottom: 20px; line-height: 1.1; font-weight: 900; }
+        .ia-text { color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.6); }
+        p { color: #ccc; margin-bottom: 35px; font-size: 1.2rem; font-weight: 300; line-height: 1.4; }
+        .btn-cta { 
+            padding: 16px 36px; border: 2px solid #ffd700; background: transparent; 
+            color: #fff; text-transform: uppercase; cursor: pointer; font-weight: 700; letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); transition: all 0.3s ease; border-radius: 4px;
+        }
+        .btn-cta:hover { background: rgba(255, 215, 0, 0.1); box-shadow: 0 0 25px rgba(255, 215, 0, 0.5); transform: translateY(-2px); }
+        #loader { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; color: #fff; }
+        .loader-spinner { width: 40px; height: 40px; border: 3px solid #333; border-top: 3px solid #ff9900; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .scroll-runway { height: 600vh; width: 100%; }
+        #start-btn { margin-top: 25px; padding: 16px 32px; background: #ff9900; color: #000; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; display: none; }
+    </style>
+</head>
+<body>
+    <div id="loader">
+        <div class="loader-spinner"></div>
+        <p id="status">Conectando con la nube...</p>
+        <button id="start-btn">Iniciar Experiencia</button>
+    </div>
+    <section id="post-hero-ui">
+        <div class="text-content">
+            <h1>VIKINGI<span class="ia-text">ALATAM</span></h1>
+            <p>Dirección creativa, contenido visual y motion con IA</p>
+            <button class="btn-cta">Ver portfolio</button>
+        </div>
+    </section>
+    <canvas id="hero-canvas"></canvas>
+    <video id="video" crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/mgecelewicz/vikingialatam@main/933132874_1781180361781745.mp4" muted playsinline preload="auto" style="display:none"></video>
+    <script>
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("hero-canvas");
+        const ctx = canvas.getContext("2d");
+        const loader = document.getElementById("loader");
+        const status = document.getElementById("status");
+        const startBtn = document.getElementById("start-btn");
+        const frames = [];
+        function resize() {
+            canvas.width = window.innerWidth * window.devicePixelRatio;
+            canvas.height = window.innerHeight * window.devicePixelRatio;
+            if(frames.length > 0) {
+                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollPercent = Math.max(0, Math.min(window.scrollY / maxScroll, 1));
+                const index = Math.floor(scrollPercent * (frames.length - 1));
+                drawFrame(index);
+            }
+        }
+        window.addEventListener('resize', resize);
+        resize();
+        async function processVideo() {
+            status.textContent = "Procesando video...";
+            const totalFrames = 60; 
+            for (let i = 0; i < totalFrames; i++) {
+                const targetTime = (i / totalFrames) * video.duration;
+                if (video.currentTime !== targetTime) {
+                    await new Promise(resolve => {
+                        const onSeeked = () => {
+                            video.removeEventListener('seeked', onSeeked);
+                            resolve();
+                        };
+                        video.addEventListener('seeked', onSeeked);
+                        video.currentTime = targetTime;
+                    });
+                }
+                try {
+                    frames.push(await createImageBitmap(video));
+                    status.textContent = `Preparando experiencia: ${Math.round((i/totalFrames)*100)}%`;
+                } catch(e) {
+                    console.error("Error decodificando frame:", e);
+                }
+            }
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 500);
+            if(frames.length > 0) drawFrame(0);
+        }
+        function drawFrame(index) {
+            const frame = frames[index];
+            if(!frame) return;
+            const ratio = Math.max(canvas.width / frame.width, canvas.height / frame.height);
+            const w = frame.width * ratio;
+            const h = frame.height * ratio;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(frame, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+        }
+        video.addEventListener('loadedmetadata', async () => {
+            try {
+                await processVideo();
+            } catch(e) {
+                status.textContent = "El navegador requiere interacción táctil";
+                startBtn.style.display = 'block';
+            }
+        });
+        startBtn.onclick = async () => {
+            startBtn.style.display = 'none';
+            video.load();
+            await processVideo();
+        };
+        video.onerror = () => status.textContent = "Error de red al conectar con GitHub.";
+        window.addEventListener('scroll', () => {
+            if (frames.length === 0) return;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = Math.max(0, Math.min(window.scrollY / maxScroll, 1));
+            const index = Math.floor(scrollPercent * (frames.length - 1));
+            drawFrame(index);
+            const ui = document.getElementById('post-hero-ui');
+            if (scrollPercent > 0.90) {
+                ui.style.opacity = '1';
+                ui.style.pointerEvents = 'auto';
+            } else {
+                ui.style.opacity = '0';
+                ui.style.pointerEvents = 'none';
+            }
+        });
+        video.load();
+    </script>
+    <div class="scroll-runway"></div>
+</body>
+</html>
