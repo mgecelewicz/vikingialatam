@@ -1,0 +1,15 @@
+/* HOTSPOT DEL SISTEMA VIVO 
+   Oculto por defecto. Solo interactivo al llegar a sección 2 
+*/
+#living-energy-hotspot { 
+    pointer-events: none; 
+}
+
+body.post-hero-active #living-energy-hotspot { 
+    pointer-events: auto; 
+    cursor: crosshair; 
+}
+
+#living-energy-canvas { 
+    pointer-events: none; 
+}
