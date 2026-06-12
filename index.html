@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIKINGIA LATAM — Premium Creative Studio</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        viking: { gold: '#D4AF37', champagne: '#E2C799', cyan: '#00E5FF', dark: '#030303' }
+                    },
+                    fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #030303; overflow-x: hidden; margin: 0; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030303; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 3px; }
+        
+        .neon-text-cyan {
+            color: #00E5FF;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.8), 0 0 25px rgba(0, 229, 255, 0.4);
+        }
+        .metallic-text {
+            background: linear-gradient(135deg, #FFFFFF 0%, #E2C799 50%, #B89B6C 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .btn-viking-outline {
+            border: 1.5px solid rgba(226, 199, 153, 0.35);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            transition: all 0.4s ease;
+        }
+        .btn-viking-outline:hover {
+            border-color: #D4AF37;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* EFECTOS HOVER PREMIUM (Fase 3) */
+        
+        /* 1. Efecto Ojos: Destello Lens Flare Cyan */
+        .eye-glow-container {
+            position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 120px; height: 60px;
+            pointer-events: none; opacity: 0;
+            transition: opacity 0.5s ease-out;
+            z-index: 2;
+        }
+        .lens-flare-core {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scaleX(0);
+            width: 180px; height: 2px;
+            background: #FFF;
+            box-shadow: 0 0 15px #00E5FF, 0 0 30px #00E5FF, 0 0 60px #00E5FF;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 50%;
+        }
+        .lens-flare-halo {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            width: 80px; height: 80px;
+            background: radial-gradient(circle, rgba(0,229,255,0.4) 0%, transparent 60%);
+            transition: transform 0.6s ease-out;
+        }
+        
+        #hotspot-eyes.active:hover .eye-glow-container { opacity: 1; }
+        #hotspot-eyes.active:hover .lens-flare-core { transform: translate(-50%, -50%) scaleX(1); }
+        #hotspot-eyes.active:hover .lens-flare-halo { transform: translate(-50%, -50%) scale(1.2); }
+
+        /* 2. Efecto Cuerpo: Flujo de Energía Interna */
+        .energy-flow-overlay {
+            position: absolute;
+            top: 15%; right: 5%; width: 45%; height: 85%;
+            pointer-events: none; opacity: 0;
+            transition: opacity 0.7s ease;
+            /* Color-dodge hace que las zonas brillantes de la imagen base estallen en luz dorada/blanca */
+            mix-blend-mode: color-dodge;
+            /* Máscara suave para limitar el efecto al contorno aproximado del torso */
+            mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 70%);
+            -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 70%);
+            overflow: hidden;
+            z-index: 1;
+        }
+        .energy-gradient-sweeper {
+            position: absolute;
+            inset: -50%; /* Más grande para rotar limpiamente */
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(212, 175, 55, 0.1) 60deg, rgba(255, 255, 255, 0.7) 180deg, rgba(212, 175, 55, 0.1) 300deg, transparent 360deg);
+            animation: rotateEnergy 4s linear infinite;
+        }
+        @keyframes rotateEnergy {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #hotspot-body.active:hover ~ .energy-flow-overlay { opacity: 1; }
+
+        /* Debug Panel Oculto por Defecto */
+        #debug-panel {
+            position: fixed; top: 10px; left: 10px; z-index: 9999;
+            background: rgba(0,0,0,0.85); border: 1px solid #00E5FF;
+            color: #00E5FF; font-family: monospace; font-size: 11px;
+            padding: 10px; border-radius: 4px; pointer-events: none;
+            display: none; /* Controlado por JS */
+        }
+        .debug-hotspot {
+            border: 1px dashed red; background: rgba(255,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="text-white selection:bg-viking-gold selection:text-black font-sans">
+
+    <!-- PANEL DE DEBUG (Inactivo en producción) -->
+    <div id="debug-panel">Iniciando motor...</div>
+
+    <!-- FASE 3: NAVEGACIÓN (z-50) Protegida sobre cualquier efecto -->
+    <header id="main-nav" class="fixed top-0 left-0 w-full z-50 px-8 py-6 flex justify-between items-center opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="text-viking-champagne">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M4 6l8-4 8 4M4 12l8-4 8 4"/></svg>
+        </div>
+        <nav class="hidden md:flex space-x-12 text-[10px] tracking-[0.3em] text-gray-400 uppercase font-medium pointer-events-auto">
+            <a href="#" class="text-viking-gold border-b border-viking-gold pb-1">Inicio</a>
+            <a href="#portfolio" class="hover:text-viking-gold transition-colors">Portfolio</a>
+            <a href="#" class="hover:text-viking-gold transition-colors">Servicios</a>
+            <a href="#" class="hover:text-viking-gold transition-colors">Sobre Mí</a>
+            <a href="#" class="hover:text-viking-gold transition-colors">Contacto</a>
+        </nav>
+        <div class="w-6 hidden md:block"></div>
+    </header>
+
+    <!-- MOTOR DE SCROLL (400vh) -->
+    <div id="scroll-wrapper" class="relative w-full h-[400vh] bg-black">
+        <div class="sticky top-0 left-0 w-full h-screen overflow-hidden">
+            
+            <!-- FASE 1: VIDEO PRINCIPAL (z-0) -->
+            <video id="hero-video" class="absolute inset-0 w-full h-full object-cover z-0" muted playsinline preload="auto" crossorigin="anonymous">
+                <source src="https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/FINAL%20final.mp4?v=20260611-2" type="video/mp4">
+            </video>
+
+            <!-- FASE 2: HANDOFF IMAGE (z-10) Evita pantallas negras y ancla el frame final -->
+            <img id="bridge-image" src="https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/hero-final-frame.jpeg?v=20260611-2" class="absolute inset-0 w-full h-full object-cover z-10 opacity-0 pointer-events-none" crossorigin="anonymous" />
+
+            <!-- FASE 1: SCROLLDOWN (z-20) -->
+            <div id="scrolldown-indicator" class="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 transition-opacity duration-300">
+                <svg class="w-5 h-5 text-gray-500 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4v16m0 0l-4-4m4 4l4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="text-[9px] tracking-[0.4em] uppercase text-gray-500 font-light">Desliza para explorar</span>
+            </div>
+
+            <!-- FASE 3: UI CENTRAL POST-HERO (z-40) Debajo del nav, pero sobre efectos -->
+            <div id="post-hero-ui" class="absolute inset-0 z-40 flex flex-col justify-center px-8 md:px-24 opacity-0 pointer-events-none items-start transform translate-y-8 transition-transform duration-500">
+                <h1 class="text-4xl sm:text-6xl md:text-[5rem] lg:text-[5.5rem] font-bold tracking-[0.25em] uppercase leading-none mb-6 drop-shadow-2xl">
+                    <span class="metallic-text">VIKING</span><span class="neon-text-cyan font-extrabold">IA</span><span class="metallic-text">LATAM</span>
+                </h1>
+                <p class="text-[10px] sm:text-xs md:text-sm tracking-[0.3em] text-gray-300 uppercase max-w-xl leading-relaxed font-light drop-shadow-md">
+                    Dirección creativa, contenido visual y motion con IA
+                </p>
+                <!-- Botón protegido por z-index -->
+                <a href="#portfolio" class="mt-10 px-8 py-3 rounded-md btn-viking-outline text-[10px] tracking-[0.25em] uppercase flex items-center gap-3 text-viking-champagne group font-medium pointer-events-auto">
+                    Ver Portfolio
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300 text-viking-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+            </div>
+
+            <!-- FASE 3: HOTSPOTS DE ENERGÍA Y VISUALES (z-30) Debajo de UI y Nav -->
+            <div id="hotspots-layer" class="absolute inset-0 z-30 pointer-events-none">
+                
+                <!-- Partículas sutiles de fondo (secundarias) -->
+                <canvas id="energy-canvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-0 transition-opacity duration-500"></canvas>
+                
+                <!-- Hotspot Cuerpo (Torso del sujeto) pointer-events:auto solo cuando es activo -->
+                <div id="hotspot-body" class="absolute top-[15%] right-[5%] w-[45%] h-[85%] rounded-[40%] pointer-events-none z-10 cursor-crosshair"></div>
+                
+                <!-- Overlay Visual del Cuerpo (Color-Dodge Shimmer) -->
+                <div class="energy-flow-overlay">
+                    <div class="energy-gradient-sweeper"></div>
+                </div>
+                
+                <!-- Hotspot Ojos -->
+                <div id="hotspot-eyes" class="absolute top-[28%] right-[22%] w-[12%] h-[12%] rounded-full pointer-events-none z-10 cursor-pointer">
+                    <div class="eye-glow-container">
+                        <div class="lens-flare-halo"></div>
+                        <div class="lens-flare-core"></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FASE 4: PREPARACIÓN PERFIL 3/4 -->
+    <div id="portfolio" class="relative w-full min-h-screen bg-[#030303] z-40 flex flex-col items-center justify-center border-t border-zinc-900/50">
+        <div class="p-8 border border-zinc-800 bg-zinc-950/50 rounded-lg text-center backdrop-blur-sm">
+            <span class="block text-viking-gold font-mono text-xs tracking-widest uppercase mb-2">[ CONTENEDOR FASE 4 ]</span>
+            <p class="text-zinc-500 font-mono text-[10px] tracking-widest uppercase">TODO: Insertar viking-profile-3-4.png cuando exista.</p>
+        </div>
+    </div>
+
+    <!-- MOTOR LERP ARQUITECTÓNICO Y CONTROL DE EVENTOS -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // === CONFIGURACIÓN DE PRODUCCIÓN ===
+            const DEBUG = false; // <-- Cambiar a true solo para verificar cajas y consola
+            
+            // DOM Elements
+            const video = document.getElementById("hero-video");
+            const bridgeImg = document.getElementById("bridge-image");
+            const scrolldown = document.getElementById("scrolldown-indicator");
+            const nav = document.getElementById("main-nav");
+            const postHeroUI = document.getElementById("post-hero-ui");
+            const hotspotBody = document.getElementById("hotspot-body");
+            const hotspotEyes = document.getElementById("hotspot-eyes");
+            const energyCanvas = document.getElementById("energy-canvas");
+            const debugPanel = document.getElementById("debug-panel");
+
+            // Configuración Debug
+            if (DEBUG) {
+                debugPanel.style.display = 'block';
+                hotspotBody.classList.add('debug-hotspot');
+                hotspotEyes.classList.add('debug-hotspot');
+            }
+
+            // Arquitectura de Scroll
+            let targetScroll = 0;
+            let currentScroll = 0;
+            const HERO_END = 0.75;
+            const HANDOFF_END = 0.85;
+            const POST_HERO_START = 0.85;
+            let videoDuration = 6;
+            
+            // Control de Estado y Rendimiento
+            let currentPhase = "HERO";
+            let postHeroActive = false;
+            let lastVideoTimeUpdate = -1; // Para throttling del video
+
+            video.addEventListener("loadedmetadata", () => {
+                videoDuration = video.duration && !isNaN(video.duration) ? video.duration : 6;
+            });
+
+            // Captura pura
+            window.addEventListener("scroll", () => {
+                const wrapper = document.getElementById("scroll-wrapper");
+                const maxScroll = wrapper.scrollHeight - window.innerHeight;
+                targetScroll = Math.max(0, Math.min(1, (window.scrollY - wrapper.offsetTop) / maxScroll));
+            });
+
+            // Motor LERP Principal
+            function updateMotor() {
+                currentScroll += (targetScroll - currentScroll) * 0.08;
+                
+                // MÁQUINA DE ESTADOS
+                if (currentScroll <= HERO_END) {
+                    currentPhase = "HERO";
+                    postHeroActive = false;
+                    
+                    // Throttle del Video: Solo actualizar si hay un delta perceptible (> 0.03s) para cuidar la CPU/GPU
+                    const targetTime = (currentScroll / HERO_END) * (videoDuration - 0.1);
+                    if (Math.abs(targetTime - lastVideoTimeUpdate) > 0.03 && video.readyState >= 1) {
+                        video.currentTime = targetTime;
+                        lastVideoTimeUpdate = targetTime;
+                    }
+                    
+                    // Visibilidad Hero Exclusiva
+                    bridgeImg.style.opacity = 0;
+                    scrolldown.style.opacity = Math.max(0, 1 - (currentScroll / 0.1));
+                    
+                    // UI Off
+                    nav.style.opacity = 0;
+                    nav.style.pointerEvents = "none";
+                    postHeroUI.style.opacity = 0;
+                    postHeroUI.style.pointerEvents = "none";
+                    postHeroUI.style.transform = `translateY(30px)`;
+                    
+                    // Hovers Desactivados
+                    hotspotBody.classList.remove("active");
+                    hotspotBody.style.pointerEvents = "none";
+                    hotspotEyes.classList.remove("active");
+                    hotspotEyes.style.pointerEvents = "none";
+                    energyCanvas.style.opacity = 0;
+
+                } else if (currentScroll <= HANDOFF_END) {
+                    currentPhase = "HANDOFF";
+                    postHeroActive = false;
+                    
+                    // Congelar video al final estricto
+                    if (lastVideoTimeUpdate !== (videoDuration - 0.1) && video.readyState >= 1) {
+                        video.currentTime = videoDuration - 0.1;
+                        lastVideoTimeUpdate = videoDuration - 0.1;
+                    }
+                    
+                    // Crossfade Imagen Puente
+                    const fadeProgress = (currentScroll - HERO_END) / (HANDOFF_END - HERO_END);
+                    bridgeImg.style.opacity = fadeProgress;
+                    scrolldown.style.opacity = 0;
+                    
+                    // UI Off
+                    nav.style.opacity = 0;
+                    postHeroUI.style.opacity = 0;
+
+                } else {
+                    currentPhase = "POST_HERO";
+                    postHeroActive = true;
+                    
+                    // Solidificar Handoff
+                    bridgeImg.style.opacity = 1;
+                    scrolldown.style.opacity = 0;
+                    
+                    // UI On (Aparición progresiva)
+                    let uiProgress = (currentScroll - POST_HERO_START) / (1 - POST_HERO_START);
+                    uiProgress = Math.max(0, Math.min(1, uiProgress * 2));
+                    
+                    nav.style.opacity = uiProgress;
+                    nav.style.pointerEvents = uiProgress > 0.5 ? "auto" : "none";
+                    postHeroUI.style.opacity = uiProgress;
+                    postHeroUI.style.pointerEvents = uiProgress > 0.5 ? "auto" : "none";
+                    postHeroUI.style.transform = `translateY(${(1 - uiProgress) * 30}px)`;
+                    
+                    // Activar eventos de Hovers (solo para el post-hero)
+                    if (uiProgress > 0.8) {
+                        hotspotBody.classList.add("active");
+                        hotspotBody.style.pointerEvents = "auto";
+                        hotspotEyes.classList.add("active");
+                        hotspotEyes.style.pointerEvents = "auto";
+                    }
+                }
+
+                // Panel Debug Tracker
+                if (DEBUG) {
+                    debugPanel.innerHTML = `
+                        <b>[ DEBUG PANEL ]</b><br>
+                        Progreso LERP: ${(currentScroll * 100).toFixed(2)}%<br>
+                        Fase: <span style="color:#FFF">${currentPhase}</span><br>
+                        Frame Vid: ${lastVideoTimeUpdate.toFixed(2)}s<br>
+                        Nav Visible: ${nav.style.pointerEvents === 'auto'}<br>
+                        PostHeroActive: ${postHeroActive}
+                    `;
+                }
+
+                requestAnimationFrame(updateMotor);
+            }
+            updateMotor(); // Iniciar LERP Loop
+
+            // ===============================================
+            // MOTOR PARTICULAS (SECUNDARIO/SUTIL PARA CUERPO)
+            // ===============================================
+            const ctx = energyCanvas.getContext("2d");
+            let particles = [];
+            let isHoveringBody = false;
+
+            function resizeCanvas() {
+                energyCanvas.width = window.innerWidth;
+                energyCanvas.height = window.innerHeight;
+            }
+            window.addEventListener("resize", resizeCanvas);
+            resizeCanvas();
+
+            // Poca cantidad de partículas, movimiento ultra-lento
+            for (let i = 0; i < 30; i++) {
+                particles.push({
+                    x: Math.random() * energyCanvas.width,
+                    y: Math.random() * energyCanvas.height,
+                    vx: (Math.random() - 0.5) * 0.15,
+                    vy: (Math.random() - 1) * 0.4,
+                    size: Math.random() * 1.2,
+                    alpha: Math.random() * 0.3 + 0.1
+                });
+            }
+
+            function animateParticles() {
+                if (!isHoveringBody || !postHeroActive) return;
+                ctx.clearRect(0, 0, energyCanvas.width, energyCanvas.height);
+
+                particles.forEach(p => {
+                    p.y += p.vy;
+                    p.x += p.vx;
+                    if (p.y < 0) p.y = energyCanvas.height;
+                    if (p.x < 0) p.x = energyCanvas.width;
+                    if (p.x > energyCanvas.width) p.x = 0;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(212, 175, 55, ${p.alpha})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(animateParticles);
+            }
+
+            hotspotBody.addEventListener("mouseenter", () => {
+                if(!postHeroActive) return;
+                isHoveringBody = true;
+                energyCanvas.style.opacity = 1;
+                animateParticles();
+            });
+            
+            hotspotBody.addEventListener("mouseleave", () => {
+                isHoveringBody = false;
+                energyCanvas.style.opacity = 0;
+                setTimeout(() => { ctx.clearRect(0, 0, energyCanvas.width, energyCanvas.height); }, 500);
+            });
+        });
+    </script>
+</body>
+</html>
