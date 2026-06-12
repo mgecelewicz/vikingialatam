@@ -23,6 +23,7 @@
         }
     </script>
 
+    <!-- ESTILOS ESTRUCTURALES DEL CORE (MANTENER EN MAIN CSS) -->
     <style>
         body { background-color: #030303; overflow-x: hidden; margin: 0; }
         ::-webkit-scrollbar { width: 6px; }
@@ -48,13 +49,18 @@
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
             transform: translateY(-2px);
         }
+    </style>
 
-        /* 
-           HOTSPOT DEL SISTEMA VIVO 
+    <!-- ======================================================== -->
+    <!-- EXTRACTO PARA: /css/living-energy.css                      -->
+    <!-- ======================================================== -->
+    <style id="living-energy-module">
+        /* HOTSPOT DEL SISTEMA VIVO 
            Oculto por defecto. Solo interactivo al llegar a sección 2 
         */
         #living-energy-hotspot { pointer-events: none; }
         body.post-hero-active #living-energy-hotspot { pointer-events: auto; cursor: crosshair; }
+        #living-energy-canvas { pointer-events: none; }
     </style>
 </head>
 <body class="text-white selection:bg-viking-gold selection:text-black font-sans">
@@ -113,9 +119,8 @@
             </div>
 
             <!-- FASE 3: MOTOR DE ENERGÍA VIVA (Z-40) -->
-            <!-- Solo ocupa el 45% derecho donde está el sujeto -->
             <div id="energy-subject-layer" class="absolute inset-y-0 right-0 w-[45%] z-40 pointer-events-none">
-                <canvas id="living-energy-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+                <canvas id="living-energy-canvas" class="absolute inset-0 w-full h-full"></canvas>
                 <div id="living-energy-hotspot" class="absolute inset-0"></div>
             </div>
 
@@ -130,9 +135,11 @@
         </div>
     </div>
 
-    <script>
+    <!-- ======================================================== -->
+    <!-- SCRIPT ORIGINAL: MOTOR DEL HERO SCROLL (INTACTO)         -->
+    <!-- ======================================================== -->
+    <script id="hero-motor-core">
         document.addEventListener("DOMContentLoaded", () => {
-            // === MOTOR FLUIDO DEL HERO (INTACTO) ===
             const canvas = document.getElementById("hero-canvas");
             const ctx = canvas.getContext("2d", { alpha: false });
             const bridgeImg = document.getElementById("bridge-image");
@@ -148,6 +155,7 @@
             let currentPhase = "INIT";
             const heroEnd = 0.75, handoffEnd = 0.85, postHeroStart = 0.85;
 
+            // Evitamos cachear en sessionStorage temporalmente hasta validar performance
             async function extractVideoFrames() {
                 return new Promise((resolve) => {
                     const tempVid = document.createElement('video');
@@ -219,17 +227,23 @@
                 
                 requestAnimationFrame(updateMotor);
             }
+        });
+    </script>
 
-            // ==========================================
-            // SISTEMA DE ENERGÍA VIVA (CANVAS PURO)
-            // ==========================================
+    <!-- ======================================================== -->
+    <!-- EXTRACTO PARA: /js/living-energy.js                        -->
+    <!-- ======================================================== -->
+    <script id="living-energy-module-js">
+        document.addEventListener("DOMContentLoaded", () => {
             const DEBUG_ENERGY = false; // <-- Cambiar a true para ver Nodos y Puntos
             
             const eCanvas = document.getElementById("living-energy-canvas");
+            if (!eCanvas) return; // Salvaguarda
+            
             const eCtx = eCanvas.getContext("2d");
             const eHotspot = document.getElementById("living-energy-hotspot");
 
-            // Coordenadas normalizadas exactas calibradas a la mitad derecha del viewport
+            // Coordenadas normalizadas exactas calibradas
             const ENERGY_NODES = [
                 { id: 'frente',  nx: 0.45, ny: 0.15, radius: 0.10, energy: 0 },
                 { id: 'ojo_izq', nx: 0.38, ny: 0.22, radius: 0.08, energy: 0 },
@@ -242,13 +256,11 @@
                 { id: 'tor_der', nx: 0.65, ny: 0.85, radius: 0.18, energy: 0 }
             ];
 
-            // Coordenadas fijas para Ojos Cyan (Lens Flare)
             const EYES_CENTER = {
                 left:  { nx: 0.38, ny: 0.22 },
                 right: { nx: 0.52, ny: 0.22 }
             };
 
-            // Conexiones para curvas Bezier Orgánicas
             const ENERGY_LINKS = [
                 ['ojo_izq', 'frente'], ['ojo_der', 'frente'],
                 ['ojo_izq', 'barba'],  ['ojo_der', 'barba'],
@@ -261,6 +273,7 @@
             let eW = 0, eH = 0;
             let mouseX = -1000, mouseY = -1000;
             let time = 0;
+            let animationFrameId = null;
 
             function resizeLivingCanvas() {
                 const rect = eHotspot.getBoundingClientRect();
@@ -272,75 +285,65 @@
             window.addEventListener('resize', resizeLivingCanvas);
             resizeLivingCanvas();
 
-            // Captura de Mouse exacto sobre la capa
             eHotspot.addEventListener('mousemove', (e) => {
                 const rect = eHotspot.getBoundingClientRect();
                 mouseX = e.clientX - rect.left;
                 mouseY = e.clientY - rect.top;
             });
             eHotspot.addEventListener('mouseleave', () => {
-                mouseX = -1000; mouseY = -1000; // Sacar el mouse del rango
+                mouseX = -1000; mouseY = -1000;
             });
 
             function renderLivingEnergy() {
-                time += 0.02; // Tiempo para ruido y ondulación orgánica
-                
-                // Limpiar Canvas totalmente (Para evitar trazos fijos o sucios sobre la imagen)
+                time += 0.02;
                 eCtx.clearRect(0, 0, eW, eH);
 
-                // Solo procesar si estamos en la fase correcta
+                // Integración con el DOM central: Pausar tracking si no estamos en fase post-hero
                 if (!document.body.classList.contains('post-hero-active')) {
                     mouseX = -1000; mouseY = -1000;
                 }
 
-                eCtx.globalCompositeOperation = 'lighter'; // Fusión aditiva tipo luz/neón
-
-                // 1. ACTUALIZAR ENERGÍA DE NODOS (Carga y Decaimiento Suave)
+                eCtx.globalCompositeOperation = 'lighter'; 
                 let maxEyeEnergy = 0;
 
+                // 1. ACTUALIZAR ENERGÍA DE NODOS
                 ENERGY_NODES.forEach(node => {
                     let nxPos = node.nx * eW;
                     let nyPos = node.ny * eH;
                     
-                    // Ruido orgánico en la posición
                     let waveX = Math.sin(time + node.nx * 10) * 5;
                     let waveY = Math.cos(time + node.ny * 10) * 5;
                     node.currentX = nxPos + waveX;
                     node.currentY = nyPos + waveY;
 
-                    // Distancia al mouse
                     let dist = Math.hypot(mouseX - nxPos, mouseY - nyPos);
                     let triggerRadius = node.radius * eW;
                     
-                    // Si el mouse está cerca, carga energía a 1.0, si no, decae suavemente
                     let targetEnergy = (dist < triggerRadius) ? 1.0 : 0.0;
-                    node.energy += (targetEnergy - node.energy) * 0.08; // LERP Damping
+                    node.energy += (targetEnergy - node.energy) * 0.08; 
 
                     if (node.id === 'ojo_izq' || node.id === 'ojo_der') {
                         if (node.energy > maxEyeEnergy) maxEyeEnergy = node.energy;
                     }
                 });
 
-                // 2. DIBUJAR NERVIOS CURVOS (Conexiones)
+                // 2. DIBUJAR NERVIOS CURVOS
                 ENERGY_LINKS.forEach(link => {
                     let n1 = ENERGY_NODES.find(n => n.id === link[0]);
                     let n2 = ENERGY_NODES.find(n => n.id === link[1]);
                     
                     if (!n1 || !n2) return;
-
                     let avgEnergy = (n1.energy + n2.energy) / 2;
                     
                     if (avgEnergy > 0.01) {
-                        // Calcular curva bezier (perpendicular offset)
                         let midX = (n1.currentX + n2.currentX) / 2;
                         let midY = (n1.currentY + n2.currentY) / 2;
                         let dx = n2.currentX - n1.currentX;
                         let dy = n2.currentY - n1.currentY;
                         
-                        let cpX = midX - dy * 0.2; // Control point X
-                        let cpY = midY + dx * 0.2; // Control point Y
+                        let cpX = midX - dy * 0.2;
+                        let cpY = midY + dx * 0.2;
 
-                        // Trazar línea de energía (Glow)
                         eCtx.beginPath();
                         eCtx.moveTo(n1.currentX, n1.currentY);
                         eCtx.quadraticCurveTo(cpX, cpY, n2.currentX, n2.currentY);
@@ -348,10 +351,8 @@
                         eCtx.lineWidth = 1 + (avgEnergy * 3);
                         eCtx.stroke();
 
-                        // Pulso viajero a través del nervio
                         let flowProgress = (time * 0.5) % 1;
                         let t = flowProgress;
-                        // Fórmula Bezier Cuadrática
                         let flowX = (1-t)*(1-t)*n1.currentX + 2*(1-t)*t*cpX + t*t*n2.currentX;
                         let flowY = (1-t)*(1-t)*n1.currentY + 2*(1-t)*t*cpY + t*t*n2.currentY;
 
@@ -366,7 +367,6 @@
                 ENERGY_NODES.forEach(node => {
                     if (node.energy > 0.01) {
                         let glowSize = (eW * 0.08) * node.energy + (Math.sin(time*5)*5);
-                        
                         let grad = eCtx.createRadialGradient(node.currentX, node.currentY, 0, node.currentX, node.currentY, glowSize);
                         grad.addColorStop(0, `rgba(255, 255, 255, ${node.energy * 0.9})`);
                         grad.addColorStop(0.2, `rgba(255, 150, 0, ${node.energy * 0.6})`);
@@ -379,20 +379,18 @@
                     }
                 });
 
-                // 4. DIBUJAR DESTELLO DE OJOS CIAN (LENS FLARE CALIBRADO)
+                // 4. DIBUJAR DESTELLO DE OJOS CIAN
                 if (maxEyeEnergy > 0.01) {
                     ['left', 'right'].forEach(side => {
                         let ex = EYES_CENTER[side].nx * eW;
                         let ey = EYES_CENTER[side].ny * eH;
 
-                        // Radial Glow Cyan
                         let eyeGlow = eCtx.createRadialGradient(ex, ey, 0, ex, ey, 60 * maxEyeEnergy);
                         eyeGlow.addColorStop(0, `rgba(0, 255, 255, ${maxEyeEnergy * 0.9})`);
                         eyeGlow.addColorStop(1, `rgba(0, 255, 255, 0)`);
                         eCtx.fillStyle = eyeGlow;
                         eCtx.beginPath(); eCtx.arc(ex, ey, 60 * maxEyeEnergy, 0, Math.PI*2); eCtx.fill();
 
-                        // Horizontal Lens Flare (Cyan/White)
                         let flareWidth = 150 * maxEyeEnergy;
                         let flareGrad = eCtx.createRadialGradient(ex, ey, 0, ex, ey, flareWidth);
                         flareGrad.addColorStop(0, `rgba(255, 255, 255, ${maxEyeEnergy})`);
@@ -406,25 +404,18 @@
                     });
                 }
 
-                // 5. MODO DEBUG VISUAL (Si DEBUG_ENERGY == true)
                 if (DEBUG_ENERGY) {
                     eCtx.globalCompositeOperation = 'source-over';
-                    
-                    // Bordes del contenedor
                     eCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)'; eCtx.strokeRect(0,0, eW, eH);
-                    
-                    // Info Mouse
                     eCtx.fillStyle = 'white'; eCtx.font = "12px monospace";
                     eCtx.fillText(`Mouse NX: ${(mouseX/eW).toFixed(2)}, NY: ${(mouseY/eH).toFixed(2)}`, 20, 30);
 
-                    // Puntos de Nodos
                     ENERGY_NODES.forEach(n => {
                         eCtx.beginPath(); eCtx.arc(n.nx * eW, n.ny * eH, n.radius * eW, 0, Math.PI*2);
                         eCtx.strokeStyle = 'rgba(255,100,0,0.5)'; eCtx.stroke();
                         eCtx.fillText(n.id, n.nx * eW + 10, n.ny * eH);
                     });
 
-                    // Puntos de Ojos
                     ['left', 'right'].forEach(side => {
                         let ex = EYES_CENTER[side].nx * eW, ey = EYES_CENTER[side].ny * eH;
                         eCtx.beginPath(); eCtx.moveTo(ex-10, ey); eCtx.lineTo(ex+10, ey); eCtx.stroke();
@@ -432,10 +423,9 @@
                     });
                 }
 
-                requestAnimationFrame(renderLivingEnergy);
+                animationFrameId = requestAnimationFrame(renderLivingEnergy);
             }
             
-            // Iniciar loop de energía viva
             renderLivingEnergy();
         });
     </script>
