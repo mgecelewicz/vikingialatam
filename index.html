@@ -124,11 +124,11 @@
                 <!-- Brillos adicionales para los ojos (Glow & Lens Flare) -->
                 <div id="eyes-glow-container" class="absolute pointer-events-none w-full h-full top-0 left-0 transition-opacity duration-300 opacity-0">
                     <!-- Ojo Izquierdo -->
-                    <div class="absolute w-2 h-2 rounded-full bg-white lens-flare-effect" style="top: 31%; left: 47.8%;"></div>
+                    <div class="absolute w-2.5 h-2.5 rounded-full bg-white lens-flare-effect" style="top: 31%; left: 47.8%;"></div>
                     <!-- Ojo Derecho -->
-                    <div class="absolute w-2 h-2 rounded-full bg-white lens-flare-effect" style="top: 31%; left: 52.8%;"></div>
+                    <div class="absolute w-2.5 h-2.5 rounded-full bg-white lens-flare-effect" style="top: 31%; left: 52.8%;"></div>
                     <!-- Destello horizontal (Lens Flare Line) -->
-                    <div class="absolute h-[2px] w-48 flare-line" style="top: 31.1%; left: 39%;"></div>
+                    <div class="absolute h-[2px] w-48 flare-line animate-pulse" style="top: 31.1%; left: 39%;"></div>
                 </div>
 
                 <!-- Hotspots invisibles pero con tracking de interacción -->
@@ -147,7 +147,7 @@
                         <path d="M12 2v20M4 6l8-4 8 4M4 12l8-4 8 4"/>
                     </svg>
                 </div>
-                <nav id="nav-links" class="hidden md:flex space-x-10 text-[10px] tracking-widest-xl text-gray-300 uppercase font-medium">
+                <nav id="nav-links" class="hidden md:flex space-x-10 text-[10px] tracking-widest-xl text-gray-300 uppercase font-medium font-sans">
                     <a href="#" class="text-viking-gold border-b border-viking-gold pb-1 transition-all">Inicio</a>
                     <a href="#portfolio" class="hover:text-viking-gold transition-colors pointer-events-auto">Portfolio</a>
                     <a href="#" class="hover:text-viking-gold transition-colors pointer-events-auto">Servicios</a>
@@ -231,7 +231,7 @@
             });
 
             // Función de Interpolación Lineal para fluidez extrema
-            function lerp(start, end, factor) {
+            function LERP(start, end, factor) {
                 return start + (end - start) * factor;
             }
 
@@ -241,7 +241,7 @@
                 targetScroll = Math.max(0, Math.min(1, window.scrollY / maxScroll));
 
                 // Suavizado LERP (El factor 0.08 define la inercia/fluidez)
-                currentScroll = lerp(currentScroll, targetScroll, 0.08);
+                currentScroll = LERP(currentScroll, targetScroll, 0.08);
 
                 // ==========================================
                 // FASE 1: HERO (0% a 75%)
@@ -302,8 +302,8 @@
                         uiLayer.style.pointerEvents = "none";
                     }
 
-                    // Activar interacciones del sujeto de energía cuando ya está estático
-                    if (uiProgress > 0.9) {
+                    // Activar interacciones del sujeto de energía cuando ya está estable
+                    if (uiProgress > 0.5) {
                         activatePostHeroInteractions();
                     } else {
                         deactivatePostHeroInteractions();
@@ -474,7 +474,7 @@
                 isHoveringBody = false;
             });
 
-            // Arrancar el motor del scroll y partículas simultáneamente
+            // Arrancar el motor del scroll y partículas simultáneamente de manera robusta
             initParticles();
             animateParticles();
             updateScroll();
