@@ -1,4 +1,10 @@
-<!-- ... existing code ... -->
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIKINGIA LATAM — Premium Creative Studio</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -6,17 +12,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
 
     <script>
-<!-- ... existing code ... -->
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        viking: { gold: '#D4AF37', champagne: '#E2C799', cyan: '#00E5FF', dark: '#030303' }
+                    },
+                    fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #030303; overflow-x: hidden; margin: 0; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030303; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 3px; }
+        
+        .neon-text-cyan {
+            color: #00E5FF;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.8), 0 0 25px rgba(0, 229, 255, 0.4);
+        }
+        .metallic-text {
+            background: linear-gradient(135deg, #FFFFFF 0%, #E2C799 50%, #B89B6C 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .btn-viking-outline {
+            border: 1.5px solid rgba(226, 199, 153, 0.35);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            transition: all 0.4s ease;
+        }
         .btn-viking-outline:hover {
             border-color: #D4AF37;
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
             transform: translateY(-2px);
         }
 
-        /* 
-           ANIMACIONES NATIVAS SCROLL-DRIVEN (ESCENA 2)
-           Sincronizadas con la GPU sin bloquear el JS 
-        */
+        /* Animaciones Scrollytelling Escena 2 */
         @keyframes blur-reveal {
             0% { opacity: 0; filter: blur(20px); transform: translateY(50px) scale(0.95); }
             100% { opacity: 1; filter: blur(0px); transform: translateY(0) scale(1); }
@@ -25,7 +59,7 @@
         .scroll-reveal-text {
             animation: blur-reveal linear both;
             animation-timeline: view();
-            animation-range: entry 10% cover 40%; /* La animación termina al cubrir el 40% del viewport */
+            animation-range: entry 10% cover 40%;
         }
         
         .font-serif-italic {
@@ -34,8 +68,58 @@
         }
     </style>
 
-    <!-- Módulo de Energía Viva -->
-<!-- ... existing code ... -->
+    <link rel="stylesheet" href="./living-energy.css">
+</head>
+<body class="text-white selection:bg-viking-gold selection:text-black font-sans">
+
+    <div id="loader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ease-in-out">
+        <div class="flex flex-col items-center">
+            <div class="w-10 h-10 border-2 border-viking-gold/20 border-t-viking-gold rounded-full animate-spin mb-4"></div>
+            <div id="loader-text" class="text-[10px] tracking-[0.4em] text-viking-champagne uppercase font-light">
+                Renderizando Motor... 0%
+            </div>
+        </div>
+    </div>
+
+    <header id="main-nav" class="fixed top-0 left-0 w-full z-50 px-8 py-6 flex justify-between items-center opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="text-viking-champagne">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M4 6l8-4 8 4M4 12l8-4 8 4"/></svg>
+        </div>
+        <nav class="hidden md:flex space-x-12 text-[10px] tracking-[0.3em] text-gray-400 uppercase font-medium pointer-events-auto">
+            <a href="#" class="text-viking-gold border-b border-viking-gold pb-1">Inicio</a>
+            <a href="#portfolio" class="hover:text-viking-gold transition-colors">Portfolio</a>
+            <a href="#" class="hover:text-viking-gold transition-colors">Servicios</a>
+            <a href="#" class="hover:text-viking-gold transition-colors">Sobre Mí</a>
+            <a href="#" class="hover:text-viking-gold transition-colors">Contacto</a>
+        </nav>
+        <div class="w-6 hidden md:block"></div>
+    </header>
+
+    <div id="scroll-wrapper" class="relative w-full h-[400vh] bg-black">
+        <div class="sticky top-0 left-0 w-full h-screen overflow-hidden">
+            
+            <canvas id="hero-canvas" class="absolute inset-0 w-full h-full object-cover z-0"></canvas>
+
+            <img id="bridge-image" src="https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/hero-final-frame.jpeg?v=20260611-3" class="absolute inset-0 w-full h-full object-cover z-10 opacity-0 pointer-events-none" crossorigin="anonymous" />
+
+            <div id="scrolldown-indicator" class="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 transition-opacity duration-300">
+                <svg class="w-5 h-5 text-gray-500 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4v16m0 0l-4-4m4 4l4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="text-[9px] tracking-[0.4em] uppercase text-gray-500 font-light">Desliza para explorar</span>
+            </div>
+
+            <div id="post-hero-ui" class="absolute inset-0 z-30 flex flex-col items-center justify-center px-4 text-center opacity-0 pointer-events-none transform translate-y-8 transition-transform duration-500">
+                <h1 class="text-4xl sm:text-6xl md:text-[5rem] lg:text-[5.5rem] font-bold tracking-[0.25em] uppercase leading-none mb-6 drop-shadow-2xl">
+                    <span class="metallic-text">VIKING</span><span class="neon-text-cyan font-extrabold">IA</span><span class="metallic-text">LATAM</span>
+                </h1>
+                <p class="text-[10px] sm:text-xs md:text-sm tracking-[0.3em] text-gray-300 uppercase max-w-xl leading-relaxed font-light drop-shadow-md">
+                    Dirección creativa, contenido visual y motion con IA
+                </p>
+                <a href="#portfolio" class="relative z-[60] mt-10 px-8 py-3 rounded-md btn-viking-outline text-[10px] tracking-[0.25em] uppercase flex items-center gap-3 text-viking-champagne group font-medium pointer-events-auto">
+                    Ver Portfolio
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300 text-viking-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+            </div>
+
             <div id="energy-subject-layer" class="absolute inset-y-0 right-0 w-[45%] z-40 pointer-events-none">
                 <canvas id="living-energy-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
                 <div id="living-energy-hotspot" class="absolute inset-0"></div>
@@ -44,13 +128,8 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- ESCENA 2: EL MANIFIESTO (SCROLLYTELLING)   -->
-    <!-- ========================================== -->
     <section id="manifesto" class="relative w-full min-h-[150vh] bg-[#030303] z-40 flex flex-col items-center py-32 px-6 sm:px-12 border-t border-zinc-900/80 overflow-hidden">
         <div class="max-w-6xl w-full mx-auto flex flex-col justify-center h-full gap-40">
-            
-            <!-- Declaración 1 -->
             <div class="scroll-reveal-text flex flex-col items-start text-left">
                 <span class="text-viking-gold font-mono text-[10px] tracking-[0.4em] uppercase mb-6 block border-l border-viking-gold pl-4">01 // El Ruido</span>
                 <h2 class="text-4xl md:text-6xl lg:text-[5rem] font-bold tracking-tighter text-white/90 leading-[1.1]">
@@ -59,7 +138,6 @@
                 </h2>
             </div>
 
-            <!-- Declaración 2 -->
             <div class="scroll-reveal-text flex flex-col items-end text-right" style="animation-range: entry 20% cover 50%;">
                 <span class="text-viking-gold font-mono text-[10px] tracking-[0.4em] uppercase mb-6 block border-r border-viking-gold pr-4">02 // El Antídoto</span>
                 <h2 class="text-4xl md:text-6xl lg:text-[5rem] font-bold tracking-tighter text-white/90 leading-[1.1]">
@@ -68,16 +146,112 @@
                 </h2>
             </div>
 
-            <!-- Resumen -->
             <div class="scroll-reveal-text mt-12 mx-auto text-center max-w-2xl" style="animation-range: entry 10% cover 30%;">
                 <p class="text-sm md:text-base text-zinc-400 font-light tracking-[0.15em] leading-relaxed uppercase">
                     Sistemas visuales impulsados por IA, WebGL y cinematografía interactiva. No maquetamos sitios web; construimos motores de retención.
                 </p>
             </div>
-            
         </div>
     </section>
 
-    <!-- ESCENA 3: SHOWREEL (PREPARACIÓN) -->
     <div id="portfolio" class="relative w-full min-h-screen bg-[#050505] z-40 flex flex-col items-center justify-center border-t border-zinc-900/50">
-<!-- ... existing code ... -->
+        <div class="p-8 border border-zinc-800 bg-zinc-950/50 rounded-lg text-center backdrop-blur-sm">
+            <span class="block text-viking-gold font-mono text-xs tracking-widest uppercase mb-2">[ CONTENEDOR FASE 4 ]</span>
+            <p class="text-zinc-500 font-mono text-[10px] tracking-widest uppercase">TODO: Insertar viking-profile-3-4.png cuando exista.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const canvas = document.getElementById("hero-canvas");
+            const ctx = canvas.getContext("2d", { alpha: false });
+            const bridgeImg = document.getElementById("bridge-image");
+            const scrolldown = document.getElementById("scrolldown-indicator");
+            const nav = document.getElementById("main-nav");
+            const postHeroUI = document.getElementById("post-hero-ui");
+            const loader = document.getElementById("loader");
+            const loaderText = document.getElementById("loader-text");
+
+            let frames = [];
+            let targetScroll = 0, currentScroll = 0;
+            let currentFrameIndex = 0;
+            let currentPhase = "INIT";
+            const heroEnd = 0.75, handoffEnd = 0.85, postHeroStart = 0.85;
+
+            async function extractVideoFrames() {
+                return new Promise((resolve) => {
+                    const tempVid = document.createElement('video');
+                    tempVid.muted = true; tempVid.playsInline = true; tempVid.crossOrigin = 'anonymous';
+                    tempVid.src = "https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/FINAL%20final.mp4?v=20260611-3";
+
+                    tempVid.addEventListener('loadeddata', async () => {
+                        const fps = 24; const totalFrames = Math.floor((tempVid.duration || 6) * fps);
+                        const scale = Math.min(tempVid.videoHeight, 720) / tempVid.videoHeight;
+                        canvas.width = Math.floor(tempVid.videoWidth * scale);
+                        canvas.height = Math.floor(tempVid.videoHeight * scale);
+
+                        const offCtx = Object.assign(document.createElement('canvas'), {width: canvas.width, height: canvas.height}).getContext('2d', {alpha: false});
+
+                        for (let i = 0; i < totalFrames; i++) {
+                            tempVid.currentTime = i / fps;
+                            await new Promise(r => tempVid.addEventListener('seeked', r, {once: true}));
+                            offCtx.drawImage(tempVid, 0, 0, canvas.width, canvas.height);
+                            try { frames.push(await createImageBitmap(offCtx.canvas)); } 
+                            catch(e) { 
+                                const c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height;
+                                c.getContext('2d', {alpha:false}).drawImage(offCtx.canvas, 0, 0); frames.push(c); 
+                            }
+                            loaderText.innerText = `Renderizando Motor... ${Math.floor((i/totalFrames)*100)}%`;
+                        }
+                        resolve();
+                    });
+                    setTimeout(resolve, 8000); 
+                });
+            }
+
+            extractVideoFrames().then(() => {
+                loader.classList.add("opacity-0"); setTimeout(() => loader.style.display = "none", 1000);
+                if(frames.length > 0) ctx.drawImage(frames[0], 0, 0, canvas.width, canvas.height);
+                updateMotor();
+            });
+
+            window.addEventListener("scroll", () => {
+                const wrapper = document.getElementById("scroll-wrapper");
+                targetScroll = Math.max(0, Math.min(1, (window.scrollY - wrapper.offsetTop) / (wrapper.scrollHeight - window.innerHeight)));
+            });
+
+            function updateMotor() {
+                currentScroll += (targetScroll - currentScroll) * 0.08;
+                let targetFrame = 0;
+
+                if (currentScroll <= heroEnd) {
+                    if (currentPhase !== "HERO") {
+                        currentPhase = "HERO"; document.body.classList.remove('post-hero-active');
+                        nav.style.opacity = 0; nav.style.pointerEvents = "none";
+                        postHeroUI.style.opacity = 0; postHeroUI.style.transform = `translateY(30px)`; bridgeImg.style.opacity = 0;
+                    }
+                    targetFrame = Math.floor((currentScroll / heroEnd) * (frames.length - 1));
+                    scrolldown.style.opacity = Math.max(0, 1 - (currentScroll / 0.1));
+                } else if (currentScroll <= handoffEnd) {
+                    if (currentPhase !== "HANDOFF") { currentPhase = "HANDOFF"; document.body.classList.remove('post-hero-active'); scrolldown.style.opacity = 0; }
+                    targetFrame = frames.length - 1; bridgeImg.style.opacity = (currentScroll - heroEnd) / (handoffEnd - heroEnd);
+                } else {
+                    if (currentPhase !== "POST_HERO") { currentPhase = "POST_HERO"; bridgeImg.style.opacity = 1; document.body.classList.add('post-hero-active'); }
+                    targetFrame = frames.length - 1;
+                    let uiProgress = Math.max(0, Math.min(1, ((currentScroll - postHeroStart) / (1 - postHeroStart)) * 2));
+                    nav.style.opacity = uiProgress; nav.style.pointerEvents = uiProgress > 0.5 ? "auto" : "none";
+                    postHeroUI.style.opacity = uiProgress; postHeroUI.style.transform = `translateY(${(1 - uiProgress) * 30}px)`;
+                }
+
+                currentFrameIndex += (targetFrame - currentFrameIndex) * 0.2;
+                let drawIndex = Math.max(0, Math.min(frames.length - 1, Math.floor(currentFrameIndex)));
+                if (frames.length > 0) ctx.drawImage(frames[drawIndex], 0, 0, canvas.width, canvas.height);
+                
+                requestAnimationFrame(updateMotor);
+            }
+        });
+    </script>
+
+    <script src="./living-energy.js" defer></script>
+</body>
+</html>
