@@ -49,70 +49,58 @@
             transform: translateY(-2px);
         }
 
-        /* FASE 3: EFECTOS HOVER PREMIUM (Sólo visibles si .post-hero-active está presente) */
-        
-        /* Efecto Ojos: Lens Flare y Glow Radial */
-        .eye-glow-overlay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 100%; height: 100%;
-            pointer-events: none; opacity: 0; transition: opacity 0.4s ease-out;
-            display: flex; align-items: center; justify-content: center;
-        }
+        /* EFECTOS VISUALES - Solo se activan mediante HOVER cuando el body es .post-hero-active */
         .lens-flare-core {
             position: absolute; width: 140px; height: 2px;
             background: #FFFFFF;
             box-shadow: 0 0 10px #00E5FF, 0 0 20px #00E5FF, 0 0 40px #00E5FF;
-            border-radius: 50%; transform: scaleX(0);
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 50%; transform: scaleX(0); opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+            pointer-events: none;
         }
-        .glow-radial {
+        .eye-glow-radial {
             position: absolute; width: 100px; height: 100px;
             background: radial-gradient(circle, rgba(0,229,255,0.7) 0%, rgba(0,229,255,0.2) 40%, transparent 70%);
-            mix-blend-mode: screen; transform: scale(0.8); transition: transform 0.6s ease-out;
+            mix-blend-mode: screen; transform: scale(0.8); opacity: 0;
+            transition: transform 0.6s ease-out, opacity 0.4s ease;
+            pointer-events: none;
         }
-
-        /* Efecto Cuerpo: Flujo Interno Energético (Color-Dodge sobre la imagen real) */
+        
         .energy-flow-overlay {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
+            position: absolute; inset: 0;
             pointer-events: none; opacity: 0; transition: opacity 0.6s ease;
-            mix-blend-mode: color-dodge; /* Ilumina las líneas doradas internas de la imagen */
+            mix-blend-mode: color-dodge;
             background-image: url('https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/hero-final-frame.jpeg?v=20260611-3');
             background-size: cover; background-position: right center;
             filter: contrast(1.8) brightness(1.3) sepia(1) hue-rotate(-15deg) saturate(3);
-            /* Máscara animada para simular el recorrido de la energía */
             -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 30%, transparent 70%);
             mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 30%, transparent 70%);
-            overflow: hidden; border-radius: 40%;
         }
-        .energy-gradient-sweeper {
-            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: conic-gradient(from 0deg, transparent 0deg, rgba(212, 175, 55, 0.15) 60deg, rgba(255, 255, 255, 0.9) 180deg, rgba(212, 175, 55, 0.15) 300deg, transparent 360deg);
-            animation: rotateEnergy 3s linear infinite;
+
+        /* ACTIVACIÓN ESTRICTA: pointer-events solo válidos en la fase 3 */
+        #hotspot-eyes, #hotspot-body {
+            pointer-events: none; /* Bloqueados por defecto */
         }
-        @keyframes rotateEnergy { 100% { transform: rotate(360deg); } }
+        body.post-hero-active #hotspot-eyes, 
+        body.post-hero-active #hotspot-body {
+            pointer-events: auto; /* Activos solo en sección 2 */
+        }
 
-        /* ESTADO ACTIVO (.post-hero-active) */
-        body.post-hero-active #hotspot-eyes { pointer-events: auto; }
-        body.post-hero-active #hotspot-body { pointer-events: auto; }
-
-        /* Interacciones Hover enlazadas */
-        body.post-hero-active #hotspot-eyes:hover .eye-glow-overlay { opacity: 1; }
-        body.post-hero-active #hotspot-eyes:hover .lens-flare-core { transform: scaleX(1); }
-        body.post-hero-active #hotspot-eyes:hover .glow-radial { transform: scale(1.1); }
+        /* Enlace de animaciones CSS al Hover */
+        body.post-hero-active #hotspot-eyes:hover .lens-flare-core { transform: scaleX(1); opacity: 1; }
+        body.post-hero-active #hotspot-eyes:hover .eye-glow-radial { transform: scale(1.1); opacity: 1; }
         body.post-hero-active #hotspot-body:hover ~ .energy-flow-overlay { opacity: 1; }
 
-        /* DEBUG VISUAL (Oculto en producción) */
+        /* MODO DEBUG VISUAL (Aislar y probar posiciones) */
         #debug-panel { display: none; }
         body.debug-mode #debug-panel { display: block; }
-        body.debug-mode #hotspot-eyes { border: 2px dashed #00E5FF; background: rgba(0,229,255,0.1); }
-        body.debug-mode #hotspot-body { border: 2px dashed #D4AF37; background: rgba(212,175,55,0.1); }
+        body.debug-mode #hotspot-eyes { border: 2px dashed #00E5FF; background: rgba(0,229,255,0.2); }
+        body.debug-mode #hotspot-body { border: 2px dashed #D4AF37; background: rgba(212,175,55,0.2); }
     </style>
 </head>
 <body class="text-white selection:bg-viking-gold selection:text-black font-sans">
 
-    <!-- PRELOADER EXTRACTOR (Esencial para la fluidez) -->
-    <div id="loader" class="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ease-in-out">
+    <div id="loader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black transition-opacity duration-1000 ease-in-out">
         <div class="flex flex-col items-center">
             <div class="w-10 h-10 border-2 border-viking-gold/20 border-t-viking-gold rounded-full animate-spin mb-4"></div>
             <div id="loader-text" class="text-[10px] tracking-[0.4em] text-viking-champagne uppercase font-light">
@@ -121,13 +109,13 @@
         </div>
     </div>
 
-    <!-- PANEL DE DEBUG -->
+    <!-- PANEL DE DEBUG TÉCNICO -->
     <div id="debug-panel" class="fixed top-4 left-4 z-[9999] bg-black/80 border border-viking-cyan p-4 font-mono text-[10px] text-viking-cyan pointer-events-none rounded">
-        <b>DEBUG PANEL</b><br>
+        <b class="text-white">DIAGNÓSTICO ACTIVO</b><br>
         <span id="dbg-phase">Phase: -</span><br>
         <span id="dbg-progress">Progress: -</span><br>
         <span id="dbg-frame">Frame ID: -</span><br>
-        <span id="dbg-hover">Hover state: Wait</span>
+        <span id="dbg-hover" class="text-viking-gold">Hover status: Esperando...</span>
     </div>
 
     <!-- FASE 3: NAVEGACIÓN (Z-50) -->
@@ -145,11 +133,10 @@
         <div class="w-6 hidden md:block"></div>
     </header>
 
-    <!-- MOTOR DE SCROLL PRINCIPAL -->
     <div id="scroll-wrapper" class="relative w-full h-[400vh] bg-black">
         <div class="sticky top-0 left-0 w-full h-screen overflow-hidden">
             
-            <!-- FASE 1: CANVAS FLUIDO (Z-0) -->
+            <!-- FASE 1: MOTOR DE CANVAS (Z-0) -->
             <canvas id="hero-canvas" class="absolute inset-0 w-full h-full object-cover z-0"></canvas>
 
             <!-- FASE 2: HANDOFF IMAGE (Z-10) -->
@@ -162,40 +149,37 @@
             </div>
 
             <!-- FASE 3: UI CENTRAL POST-HERO (Z-30) -->
-            <div id="post-hero-ui" class="absolute inset-0 z-30 flex flex-col justify-center px-8 md:px-24 opacity-0 pointer-events-none items-start transform translate-y-8 transition-transform duration-500">
+            <div id="post-hero-ui" class="absolute inset-0 z-30 flex flex-col items-center justify-center px-4 text-center opacity-0 pointer-events-none transform translate-y-8 transition-transform duration-500">
                 <h1 class="text-4xl sm:text-6xl md:text-[5rem] lg:text-[5.5rem] font-bold tracking-[0.25em] uppercase leading-none mb-6 drop-shadow-2xl">
                     <span class="metallic-text">VIKING</span><span class="neon-text-cyan font-extrabold">IA</span><span class="metallic-text">LATAM</span>
                 </h1>
                 <p class="text-[10px] sm:text-xs md:text-sm tracking-[0.3em] text-gray-300 uppercase max-w-xl leading-relaxed font-light drop-shadow-md">
                     Dirección creativa, contenido visual y motion con IA
                 </p>
-                <!-- Botón protegido con pointer-events-auto -->
-                <a href="#portfolio" class="mt-10 px-8 py-3 rounded-md btn-viking-outline text-[10px] tracking-[0.25em] uppercase flex items-center gap-3 text-viking-champagne group font-medium pointer-events-auto">
+                <!-- Botón protegido con Z-Index superior (z-60) para no ser tapado por los hotspots -->
+                <a href="#portfolio" class="relative z-[60] mt-10 px-8 py-3 rounded-md btn-viking-outline text-[10px] tracking-[0.25em] uppercase flex items-center gap-3 text-viking-champagne group font-medium pointer-events-auto">
                     Ver Portfolio
                     <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300 text-viking-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </a>
             </div>
 
-            <!-- FASE 3: CAPA DE HOTSPOTS (Z-40) Agrupados estructuralmente -->
-            <div id="energy-subject-layer" class="absolute inset-0 z-40 pointer-events-none">
+            <!-- FASE 3: CAPA DE HOTSPOTS (Z-40) - Estrictamente limitada a la imagen del sujeto -->
+            <div id="energy-subject-layer" class="absolute inset-0 z-40 pointer-events-none flex justify-end items-center">
                 
-                <!-- Contenedor relativo a la posición del sujeto (Mitad derecha de la pantalla) -->
-                <div class="absolute top-[5%] right-[0%] w-[60%] h-[90%] md:w-[45%] pointer-events-none">
+                <!-- Bounding Box limitado al 45% de la pantalla derecha donde está el sujeto -->
+                <div class="relative w-[50%] h-[90%] pointer-events-none">
                     
-                    <!-- Capa Visual Efecto Cuerpo (Asociada por CSS sibling '~') -->
-                    <div class="energy-flow-overlay">
-                        <div class="energy-gradient-sweeper"></div>
+                    <!-- Efecto visual en DOM pero inactivo sin Hover -->
+                    <div class="energy-flow-overlay"></div>
+                    
+                    <!-- Hotspot Cuerpo -->
+                    <div id="hotspot-body" class="absolute top-[20%] left-[10%] w-[70%] h-[75%] rounded-[40%] cursor-crosshair flex flex-col justify-end pb-10 items-center">
                     </div>
                     
-                    <!-- Hotspot Cuerpo (Torso) -->
-                    <div id="hotspot-body" class="absolute top-[25%] left-[20%] w-[60%] h-[75%] rounded-[40%] pointer-events-none cursor-crosshair"></div>
-                    
                     <!-- Hotspot Ojos -->
-                    <div id="hotspot-eyes" class="absolute top-[28%] left-[45%] w-[25%] h-[15%] rounded-full pointer-events-none cursor-pointer">
-                        <div class="eye-glow-overlay">
-                            <div class="glow-radial"></div>
-                            <div class="lens-flare-core"></div>
-                        </div>
+                    <div id="hotspot-eyes" class="absolute top-[28%] left-[45%] w-[30%] h-[15%] rounded-full cursor-pointer flex items-center justify-center">
+                        <div class="eye-glow-radial"></div>
+                        <div class="lens-flare-core"></div>
                     </div>
                 </div>
             </div>
@@ -213,9 +197,12 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // === CONFIGURACIÓN ===
-            const DEBUG = false; // Cambiar a true para ver cajas rojas, cyan y console logs.
-            if (DEBUG) document.body.classList.add('debug-mode');
+            // === CONTROL DE DIAGNÓSTICO (Cambiar a false para Producción) ===
+            const DEBUG = true; 
+            
+            if (DEBUG) {
+                document.body.classList.add('debug-mode');
+            }
 
             // Referencias DOM
             const canvas = document.getElementById("hero-canvas");
@@ -227,24 +214,23 @@
             const loader = document.getElementById("loader");
             const loaderText = document.getElementById("loader-text");
             
-            // Hotspots
             const hotspotEyes = document.getElementById("hotspot-eyes");
             const hotspotBody = document.getElementById("hotspot-body");
+            const dbgHover = document.getElementById("dbg-hover");
 
-            // Variables de Arquitectura (LERP)
+            // Arrays y Variables LERP
             let frames = [];
             let targetScroll = 0;
             let currentScroll = 0;
             let currentFrameIndex = 0;
             let currentPhase = "INIT";
             
+            // Fases exactas
             const heroEnd = 0.75;
             const handoffEnd = 0.85;
             const postHeroStart = 0.85;
 
-            // ==========================================
-            // 1. EXTRACTOR Y PRECARGA DE FRAMES (FLUIDEZ ABSOLUTA)
-            // ==========================================
+            // 1. EXTRACTOR FLUIDO EN MEMORIA
             async function extractVideoFrames() {
                 return new Promise((resolve) => {
                     const tempVid = document.createElement('video');
@@ -255,19 +241,17 @@
 
                     tempVid.addEventListener('loadeddata', async () => {
                         const duration = tempVid.duration || 6;
-                        const fps = 24; // Muestreo a 24fps para equilibrio memoria/fluidez
+                        const fps = 24;
                         const totalFrames = Math.floor(duration * fps);
                         
-                        // Escalar resolución internamente para evitar crashes de RAM en móviles
                         const targetHeight = Math.min(tempVid.videoHeight, 720);
                         const scale = targetHeight / tempVid.videoHeight;
                         canvas.width = Math.floor(tempVid.videoWidth * scale);
                         canvas.height = Math.floor(tempVid.videoHeight * scale);
 
                         const offCanvas = document.createElement('canvas');
-                        offCanvas.width = canvas.width;
-                        offCanvas.height = canvas.height;
-                        const offCtx = offCanvas.getContext('2d');
+                        offCanvas.width = canvas.width; offCanvas.height = canvas.height;
+                        const offCtx = offCanvas.getContext('2d', { alpha: false });
 
                         for (let i = 0; i < totalFrames; i++) {
                             tempVid.currentTime = i / fps;
@@ -278,143 +262,113 @@
                                 const bitmap = await createImageBitmap(offCanvas);
                                 frames.push(bitmap);
                             } catch(e) {
-                                // Fallback a canvas estándar si ImageBitmap falla
                                 const c = document.createElement('canvas');
                                 c.width = canvas.width; c.height = canvas.height;
-                                c.getContext('2d').drawImage(offCanvas, 0, 0);
+                                c.getContext('2d', {alpha: false}).drawImage(offCanvas, 0, 0);
                                 frames.push(c);
                             }
-                            
                             loaderText.innerText = `Renderizando Motor... ${Math.floor((i/totalFrames)*100)}%`;
                         }
                         resolve();
                     });
-
-                    // Timeout de seguridad si el video falla por red
-                    setTimeout(resolve, 8000); 
+                    setTimeout(resolve, 8000); // Fallback de seguridad
                 });
             }
 
-            // Iniciar extracción y luego arrancar motor
             extractVideoFrames().then(() => {
                 loader.classList.add("opacity-0");
                 setTimeout(() => loader.style.display = "none", 1000);
-                
-                // Dibujar primer frame
                 if(frames.length > 0) ctx.drawImage(frames[0], 0, 0, canvas.width, canvas.height);
-                
-                updateMotor(); // Arrancar LERP Loop
+                updateMotor();
             });
 
-            // Captura de Scroll Rápida
             window.addEventListener("scroll", () => {
                 const wrapper = document.getElementById("scroll-wrapper");
                 const maxScroll = wrapper.scrollHeight - window.innerHeight;
                 targetScroll = Math.max(0, Math.min(1, (window.scrollY - wrapper.offsetTop) / maxScroll));
             });
 
-            // ==========================================
-            // 2. MOTOR LERP & ARQUITECTURA DE FASES
-            // ==========================================
             function updateMotor() {
                 currentScroll += (targetScroll - currentScroll) * 0.08;
                 let targetFrame = 0;
 
-                // === FASE 1: HERO ===
+                // FASE 1: HERO
                 if (currentScroll <= heroEnd) {
                     if (currentPhase !== "HERO") {
                         currentPhase = "HERO";
                         document.body.classList.remove('post-hero-active'); // Bloquea Hovers
-                        
-                        nav.style.opacity = 0;
-                        nav.style.pointerEvents = "none";
-                        postHeroUI.style.opacity = 0;
-                        postHeroUI.style.transform = `translateY(30px)`;
+                        nav.style.opacity = 0; nav.style.pointerEvents = "none";
+                        postHeroUI.style.opacity = 0; postHeroUI.style.transform = `translateY(30px)`;
                         bridgeImg.style.opacity = 0;
                     }
-                    
-                    const progress = currentScroll / heroEnd;
-                    targetFrame = Math.floor(progress * (frames.length - 1));
+                    targetFrame = Math.floor((currentScroll / heroEnd) * (frames.length - 1));
                     scrolldown.style.opacity = Math.max(0, 1 - (currentScroll / 0.1));
                 } 
-                // === FASE 2: HANDOFF ===
+                // FASE 2: HANDOFF
                 else if (currentScroll <= handoffEnd) {
                     if (currentPhase !== "HANDOFF") {
                         currentPhase = "HANDOFF";
                         document.body.classList.remove('post-hero-active');
                         scrolldown.style.opacity = 0;
                     }
-                    
-                    targetFrame = frames.length - 1; // Congelar estricto en el último
-                    
-                    const fadeProgress = (currentScroll - heroEnd) / (handoffEnd - heroEnd);
-                    bridgeImg.style.opacity = fadeProgress;
+                    targetFrame = frames.length - 1; // CLAVADO EN EL ÚLTIMO FRAME
+                    bridgeImg.style.opacity = (currentScroll - heroEnd) / (handoffEnd - heroEnd);
                 } 
-                // === FASE 3: POST-HERO ===
+                // FASE 3: POST-HERO (SECCIÓN 2)
                 else {
                     if (currentPhase !== "POST_HERO") {
                         currentPhase = "POST_HERO";
                         bridgeImg.style.opacity = 1;
-                        document.body.classList.add('post-hero-active'); // ¡Habilita Hovers CSS/JS!
+                        document.body.classList.add('post-hero-active'); // ACTIVA LOS HOVERS
                     }
-                    
-                    targetFrame = frames.length - 1; // Sigue congelado
+                    targetFrame = frames.length - 1; // SIGUE CLAVADO
 
-                    let uiProgress = (currentScroll - postHeroStart) / (1 - postHeroStart);
-                    uiProgress = Math.max(0, Math.min(1, uiProgress * 2));
-                    
+                    let uiProgress = Math.max(0, Math.min(1, ((currentScroll - postHeroStart) / (1 - postHeroStart)) * 2));
                     nav.style.opacity = uiProgress;
                     nav.style.pointerEvents = uiProgress > 0.5 ? "auto" : "none";
-                    
                     postHeroUI.style.opacity = uiProgress;
                     postHeroUI.style.transform = `translateY(${(1 - uiProgress) * 30}px)`;
                 }
 
-                // LERP sobre Índice de Frame (drawFrame fluido)
+                // Dibujado LERP
                 currentFrameIndex += (targetFrame - currentFrameIndex) * 0.2;
-                let drawIndex = Math.floor(currentFrameIndex);
-                
-                // Asegurar que no rebase el array y dibujar
+                let drawIndex = Math.max(0, Math.min(frames.length - 1, Math.floor(currentFrameIndex)));
                 if (frames.length > 0) {
-                    drawIndex = Math.max(0, Math.min(frames.length - 1, drawIndex));
                     ctx.drawImage(frames[drawIndex], 0, 0, canvas.width, canvas.height);
                 }
 
-                // Panel Debug
                 if (DEBUG) {
                     document.getElementById("dbg-phase").innerText = `Phase: ${currentPhase}`;
                     document.getElementById("dbg-progress").innerText = `Progress: ${(currentScroll * 100).toFixed(2)}%`;
-                    document.getElementById("dbg-frame").innerText = `Frame ID: ${drawIndex}`;
+                    document.getElementById("dbg-frame").innerText = `Frame: ${drawIndex} / ${frames.length - 1}`;
                 }
 
                 requestAnimationFrame(updateMotor);
             }
 
             // ==========================================
-            // 3. OYENTES DE EVENTOS & LOGS DE VALIDACIÓN
+            // LOGS DE DIAGNÓSTICO ESTRICTO
             // ==========================================
-            const dbgHover = document.getElementById("dbg-hover");
-
             hotspotEyes.addEventListener("mouseenter", () => {
                 if(!document.body.classList.contains('post-hero-active')) return;
-                console.log("eyes hover enter");
-                if(DEBUG) dbgHover.innerText = `Hover state: EYES ACTIVE`;
+                console.log("EYES ENTER");
+                if(DEBUG) dbgHover.innerText = "Hover status: EYES ACTIVE";
             });
             hotspotEyes.addEventListener("mouseleave", () => {
                 if(!document.body.classList.contains('post-hero-active')) return;
-                console.log("eyes hover leave");
-                if(DEBUG) dbgHover.innerText = `Hover state: Wait`;
+                console.log("EYES LEAVE");
+                if(DEBUG) dbgHover.innerText = "Hover status: Esperando...";
             });
 
             hotspotBody.addEventListener("mouseenter", () => {
                 if(!document.body.classList.contains('post-hero-active')) return;
-                console.log("body hover enter");
-                if(DEBUG) dbgHover.innerText = `Hover state: BODY ACTIVE`;
+                console.log("BODY ENTER");
+                if(DEBUG) dbgHover.innerText = "Hover status: BODY ACTIVE";
             });
             hotspotBody.addEventListener("mouseleave", () => {
                 if(!document.body.classList.contains('post-hero-active')) return;
-                console.log("body hover leave");
-                if(DEBUG) dbgHover.innerText = `Hover state: Wait`;
+                console.log("BODY LEAVE");
+                if(DEBUG) dbgHover.innerText = "Hover status: Esperando...";
             });
 
         });
