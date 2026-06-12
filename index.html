@@ -49,15 +49,12 @@
             transform: translateY(-2px);
         }
 
-        /* ACTIVACIÓN ESTRICTA DEL NUEVO HOTSPOT 
-           Se activa únicamente cuando la Fase 3 está en marcha
+        /* 
+           HOTSPOT DEL SISTEMA VIVO 
+           Oculto por defecto. Solo interactivo al llegar a sección 2 
         */
-        #energy-interaction-hotspot { pointer-events: none; }
-        body.post-hero-active #energy-interaction-hotspot { pointer-events: auto; cursor: crosshair; }
-
-        /* MODO DEBUG GENERAL */
-        #debug-panel { display: none; }
-        body.debug-mode #debug-panel { display: block; }
+        #living-energy-hotspot { pointer-events: none; }
+        body.post-hero-active #living-energy-hotspot { pointer-events: auto; cursor: crosshair; }
     </style>
 </head>
 <body class="text-white selection:bg-viking-gold selection:text-black font-sans">
@@ -69,14 +66,6 @@
                 Renderizando Motor... 0%
             </div>
         </div>
-    </div>
-
-    <!-- PANEL DE DEBUG TÉCNICO -->
-    <div id="debug-panel" class="fixed top-4 left-4 z-[9999] bg-black/80 border border-viking-cyan p-4 font-mono text-[10px] text-viking-cyan pointer-events-none rounded">
-        <b class="text-white">DIAGNÓSTICO ACTIVO</b><br>
-        <span id="dbg-phase">Phase: -</span><br>
-        <span id="dbg-progress">Progress: -</span><br>
-        <span id="dbg-frame">Frame ID: -</span><br>
     </div>
 
     <!-- NAVEGACIÓN (Z-50) -->
@@ -97,10 +86,10 @@
     <div id="scroll-wrapper" class="relative w-full h-[400vh] bg-black">
         <div class="sticky top-0 left-0 w-full h-screen overflow-hidden">
             
-            <!-- MOTOR DE CANVAS (Z-0) -->
+            <!-- FASE 1: CANVAS VIDEO (Z-0) -->
             <canvas id="hero-canvas" class="absolute inset-0 w-full h-full object-cover z-0"></canvas>
 
-            <!-- HANDOFF IMAGE (Z-10) -->
+            <!-- FASE 2: IMAGEN PUENTE HANDOFF (Z-10) -->
             <img id="bridge-image" src="https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/hero-final-frame.jpeg?v=20260611-3" class="absolute inset-0 w-full h-full object-cover z-10 opacity-0 pointer-events-none" crossorigin="anonymous" />
 
             <!-- SCROLLDOWN (Z-20) -->
@@ -109,7 +98,7 @@
                 <span class="text-[9px] tracking-[0.4em] uppercase text-gray-500 font-light">Desliza para explorar</span>
             </div>
 
-            <!-- UI CENTRAL POST-HERO (Z-30) -->
+            <!-- FASE 3: UI CENTRAL (Z-30) -->
             <div id="post-hero-ui" class="absolute inset-0 z-30 flex flex-col items-center justify-center px-4 text-center opacity-0 pointer-events-none transform translate-y-8 transition-transform duration-500">
                 <h1 class="text-4xl sm:text-6xl md:text-[5rem] lg:text-[5.5rem] font-bold tracking-[0.25em] uppercase leading-none mb-6 drop-shadow-2xl">
                     <span class="metallic-text">VIKING</span><span class="neon-text-cyan font-extrabold">IA</span><span class="metallic-text">LATAM</span>
@@ -123,10 +112,11 @@
                 </a>
             </div>
 
-            <!-- CONTENEDOR UNIFICADO INTERACTIVO DE ENERGÍA (Z-40) -->
+            <!-- FASE 3: MOTOR DE ENERGÍA VIVA (Z-40) -->
+            <!-- Solo ocupa el 45% derecho donde está el sujeto -->
             <div id="energy-subject-layer" class="absolute inset-y-0 right-0 w-[45%] z-40 pointer-events-none">
-                <canvas id="energy-interaction-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
-                <div id="energy-interaction-hotspot" class="absolute inset-0"></div>
+                <canvas id="living-energy-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+                <div id="living-energy-hotspot" class="absolute inset-0"></div>
             </div>
 
         </div>
@@ -142,17 +132,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // ==========================================
-            // CONFIGURACIONES Y DEBUG
-            // ==========================================
-            const DEBUG_MOTOR = false; 
-            const DEBUG_HOVER = false; // Cambiar a true para calibrar coords visualmente
-
-            if (DEBUG_MOTOR) document.body.classList.add('debug-mode');
-
-            // ==========================================
-            // MOTOR FLUIDO DEL HERO (Intacto)
-            // ==========================================
+            // === MOTOR FLUIDO DEL HERO (INTACTO) ===
             const canvas = document.getElementById("hero-canvas");
             const ctx = canvas.getContext("2d", { alpha: false });
             const bridgeImg = document.getElementById("bridge-image");
@@ -195,7 +175,7 @@
                         }
                         resolve();
                     });
-                    setTimeout(resolve, 8000);
+                    setTimeout(resolve, 8000); // Timeout seguridad
                 });
             }
 
@@ -237,183 +217,226 @@
                 let drawIndex = Math.max(0, Math.min(frames.length - 1, Math.floor(currentFrameIndex)));
                 if (frames.length > 0) ctx.drawImage(frames[drawIndex], 0, 0, canvas.width, canvas.height);
                 
-                if (DEBUG_MOTOR) {
-                    document.getElementById("dbg-phase").innerText = `Phase: ${currentPhase}`;
-                    document.getElementById("dbg-progress").innerText = `Progress: ${(currentScroll * 100).toFixed(2)}%`;
-                    document.getElementById("dbg-frame").innerText = `Frame: ${drawIndex} / ${frames.length - 1}`;
-                }
                 requestAnimationFrame(updateMotor);
             }
 
             // ==========================================
-            // MOTOR DE ENERGÍA INTERACTIVA (HOVERS SECCIÓN 2)
+            // SISTEMA DE ENERGÍA VIVA (CANVAS PURO)
             // ==========================================
-            const eCanvas = document.getElementById("energy-interaction-canvas");
+            const DEBUG_ENERGY = false; // <-- Cambiar a true para ver Nodos y Puntos
+            
+            const eCanvas = document.getElementById("living-energy-canvas");
             const eCtx = eCanvas.getContext("2d");
-            const eHotspot = document.getElementById("energy-interaction-hotspot");
+            const eHotspot = document.getElementById("living-energy-hotspot");
 
-            // Nodos (Coordenadas X, Y normalizadas al 45% del div derecho)
+            // Coordenadas normalizadas exactas calibradas a la mitad derecha del viewport
             const ENERGY_NODES = [
-                { id: 0, name: 'Ojo Izquierdo', nx: 0.38, ny: 0.22, radius: 0.1, energy: 0, pulse: 0 },
-                { id: 1, name: 'Ojo Derecho',   nx: 0.52, ny: 0.22, radius: 0.1, energy: 0, pulse: 0 },
-                { id: 2, name: 'Rostro',        nx: 0.45, ny: 0.28, radius: 0.15, energy: 0, pulse: 0 },
-                { id: 3, name: 'Barba',         nx: 0.45, ny: 0.42, radius: 0.15, energy: 0, pulse: 0 },
-                { id: 4, name: 'Pecho',         nx: 0.45, ny: 0.60, radius: 0.2, energy: 0, pulse: 0 },
-                { id: 5, name: 'Hombro Izq',    nx: 0.15, ny: 0.55, radius: 0.18, energy: 0, pulse: 0 },
-                { id: 6, name: 'Hombro Der',    nx: 0.75, ny: 0.55, radius: 0.18, energy: 0, pulse: 0 },
-                { id: 7, name: 'Torso Izq',     nx: 0.25, ny: 0.85, radius: 0.18, energy: 0, pulse: 0 },
-                { id: 8, name: 'Torso Der',     nx: 0.65, ny: 0.85, radius: 0.18, energy: 0, pulse: 0 }
+                { id: 'frente',  nx: 0.45, ny: 0.15, radius: 0.10, energy: 0 },
+                { id: 'ojo_izq', nx: 0.38, ny: 0.22, radius: 0.08, energy: 0 },
+                { id: 'ojo_der', nx: 0.52, ny: 0.22, radius: 0.08, energy: 0 },
+                { id: 'barba',   nx: 0.45, ny: 0.38, radius: 0.15, energy: 0 },
+                { id: 'pecho',   nx: 0.45, ny: 0.60, radius: 0.20, energy: 0 },
+                { id: 'hom_izq', nx: 0.15, ny: 0.55, radius: 0.18, energy: 0 },
+                { id: 'hom_der', nx: 0.75, ny: 0.55, radius: 0.18, energy: 0 },
+                { id: 'tor_izq', nx: 0.25, ny: 0.85, radius: 0.18, energy: 0 },
+                { id: 'tor_der', nx: 0.65, ny: 0.85, radius: 0.18, energy: 0 }
             ];
 
-            // Conexiones de energía (Líneas)
-            const ENERGY_EDGES = [
-                [0,2], [1,2], [2,3], [3,4], [4,5], [4,6], [4,7], [4,8], [5,7], [6,8]
+            // Coordenadas fijas para Ojos Cyan (Lens Flare)
+            const EYES_CENTER = {
+                left:  { nx: 0.38, ny: 0.22 },
+                right: { nx: 0.52, ny: 0.22 }
+            };
+
+            // Conexiones para curvas Bezier Orgánicas
+            const ENERGY_LINKS = [
+                ['ojo_izq', 'frente'], ['ojo_der', 'frente'],
+                ['ojo_izq', 'barba'],  ['ojo_der', 'barba'],
+                ['frente', 'pecho'],   ['barba', 'pecho'],
+                ['pecho', 'hom_izq'],  ['pecho', 'hom_der'],
+                ['pecho', 'tor_izq'],  ['pecho', 'tor_der'],
+                ['hom_izq', 'tor_izq'],['hom_der', 'tor_der']
             ];
 
-            const EYES_CENTER = { nx: 0.45, ny: 0.22 };
+            let eW = 0, eH = 0;
+            let mouseX = -1000, mouseY = -1000;
+            let time = 0;
 
-            let mouseNx = -1, mouseNy = -1;
-            let isHovering = false;
-            let eyesFlareEnergy = 0;
-            let canvasW = 0, canvasH = 0;
-
-            function resizeEnergyCanvas() {
+            function resizeLivingCanvas() {
                 const rect = eHotspot.getBoundingClientRect();
                 eCanvas.width = rect.width;
                 eCanvas.height = rect.height;
-                canvasW = rect.width;
-                canvasH = rect.height;
+                eW = rect.width;
+                eH = rect.height;
             }
-            window.addEventListener('resize', resizeEnergyCanvas);
-            resizeEnergyCanvas(); // Inicio
+            window.addEventListener('resize', resizeLivingCanvas);
+            resizeLivingCanvas();
 
+            // Captura de Mouse exacto sobre la capa
             eHotspot.addEventListener('mousemove', (e) => {
                 const rect = eHotspot.getBoundingClientRect();
-                mouseNx = (e.clientX - rect.left) / rect.width;
-                mouseNy = (e.clientY - rect.top) / rect.height;
-                isHovering = true;
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
             });
-            eHotspot.addEventListener('mouseleave', () => { isHovering = false; });
+            eHotspot.addEventListener('mouseleave', () => {
+                mouseX = -1000; mouseY = -1000; // Sacar el mouse del rango
+            });
 
-            function renderEnergyLoop() {
-                // Borrado del frame para el canvas de efectos
-                eCtx.clearRect(0, 0, canvasW, canvasH);
+            function renderLivingEnergy() {
+                time += 0.02; // Tiempo para ruido y ondulación orgánica
+                
+                // Limpiar Canvas totalmente (Para evitar trazos fijos o sucios sobre la imagen)
+                eCtx.clearRect(0, 0, eW, eH);
 
+                // Solo procesar si estamos en la fase correcta
                 if (!document.body.classList.contains('post-hero-active')) {
-                    isHovering = false; // Reset de seguridad
+                    mouseX = -1000; mouseY = -1000;
                 }
 
-                eCtx.globalCompositeOperation = "lighter";
+                eCtx.globalCompositeOperation = 'lighter'; // Fusión aditiva tipo luz/neón
 
-                // 1. DIBUJO DE LÍNEAS DE ENERGÍA Y PULSOS
-                ENERGY_EDGES.forEach(edge => {
-                    let n1 = ENERGY_NODES[edge[0]];
-                    let n2 = ENERGY_NODES[edge[1]];
-                    let maxE = Math.max(n1.energy, n2.energy);
+                // 1. ACTUALIZAR ENERGÍA DE NODOS (Carga y Decaimiento Suave)
+                let maxEyeEnergy = 0;
+
+                ENERGY_NODES.forEach(node => {
+                    let nxPos = node.nx * eW;
+                    let nyPos = node.ny * eH;
                     
-                    if (maxE > 0.01) {
-                        eCtx.beginPath();
-                        eCtx.moveTo(n1.nx * canvasW, n1.ny * canvasH);
-                        eCtx.lineTo(n2.nx * canvasW, n2.ny * canvasH);
-                        eCtx.strokeStyle = `rgba(255, 170, 0, ${maxE * 0.7})`;
-                        eCtx.lineWidth = 1 + (maxE * 3);
-                        eCtx.stroke();
+                    // Ruido orgánico en la posición
+                    let waveX = Math.sin(time + node.nx * 10) * 5;
+                    let waveY = Math.cos(time + node.ny * 10) * 5;
+                    node.currentX = nxPos + waveX;
+                    node.currentY = nyPos + waveY;
+
+                    // Distancia al mouse
+                    let dist = Math.hypot(mouseX - nxPos, mouseY - nyPos);
+                    let triggerRadius = node.radius * eW;
+                    
+                    // Si el mouse está cerca, carga energía a 1.0, si no, decae suavemente
+                    let targetEnergy = (dist < triggerRadius) ? 1.0 : 0.0;
+                    node.energy += (targetEnergy - node.energy) * 0.08; // LERP Damping
+
+                    if (node.id === 'ojo_izq' || node.id === 'ojo_der') {
+                        if (node.energy > maxEyeEnergy) maxEyeEnergy = node.energy;
+                    }
+                });
+
+                // 2. DIBUJAR NERVIOS CURVOS (Conexiones)
+                ENERGY_LINKS.forEach(link => {
+                    let n1 = ENERGY_NODES.find(n => n.id === link[0]);
+                    let n2 = ENERGY_NODES.find(n => n.id === link[1]);
+                    
+                    if (!n1 || !n2) return;
+
+                    let avgEnergy = (n1.energy + n2.energy) / 2;
+                    
+                    if (avgEnergy > 0.01) {
+                        // Calcular curva bezier (perpendicular offset)
+                        let midX = (n1.currentX + n2.currentX) / 2;
+                        let midY = (n1.currentY + n2.currentY) / 2;
+                        let dx = n2.currentX - n1.currentX;
+                        let dy = n2.currentY - n1.currentY;
                         
-                        // Partícula sutil viajando
-                        let travelProgress = (Date.now() / 1000 % 1);
-                        let px = n1.nx + (n2.nx - n1.nx) * travelProgress;
-                        let py = n1.ny + (n2.ny - n1.ny) * travelProgress;
+                        let cpX = midX - dy * 0.2; // Control point X
+                        let cpY = midY + dx * 0.2; // Control point Y
+
+                        // Trazar línea de energía (Glow)
                         eCtx.beginPath();
-                        eCtx.arc(px * canvasW, py * canvasH, 2 * maxE, 0, Math.PI*2);
-                        eCtx.fillStyle = `rgba(255, 220, 150, ${maxE})`;
+                        eCtx.moveTo(n1.currentX, n1.currentY);
+                        eCtx.quadraticCurveTo(cpX, cpY, n2.currentX, n2.currentY);
+                        eCtx.strokeStyle = `rgba(255, 180, 50, ${avgEnergy * 0.6})`;
+                        eCtx.lineWidth = 1 + (avgEnergy * 3);
+                        eCtx.stroke();
+
+                        // Pulso viajero a través del nervio
+                        let flowProgress = (time * 0.5) % 1;
+                        let t = flowProgress;
+                        // Fórmula Bezier Cuadrática
+                        let flowX = (1-t)*(1-t)*n1.currentX + 2*(1-t)*t*cpX + t*t*n2.currentX;
+                        let flowY = (1-t)*(1-t)*n1.currentY + 2*(1-t)*t*cpY + t*t*n2.currentY;
+
+                        eCtx.beginPath();
+                        eCtx.arc(flowX, flowY, 2.5 * avgEnergy, 0, Math.PI * 2);
+                        eCtx.fillStyle = `rgba(255, 255, 255, ${avgEnergy})`;
                         eCtx.fill();
                     }
                 });
 
-                // 2. CÁLCULO Y DIBUJO DE NODOS DE ENERGÍA (CUERPO)
+                // 3. DIBUJAR PULSOS DE NODOS SOLARES
                 ENERGY_NODES.forEach(node => {
-                    let dist = Math.hypot(mouseNx - node.nx, mouseNy - node.ny);
-                    let targetEnergy = (isHovering && dist < node.radius) ? 1.0 : 0.0;
-                    
-                    node.energy += (targetEnergy - node.energy) * 0.1; // Smooth LERP
-                    node.pulse += 0.1;
-
                     if (node.energy > 0.01) {
-                        let px = node.nx * canvasW;
-                        let py = node.ny * canvasH;
-                        let glowRadius = (canvasW * 0.15) * node.energy + Math.sin(node.pulse)*2;
+                        let glowSize = (eW * 0.08) * node.energy + (Math.sin(time*5)*5);
                         
-                        let grad = eCtx.createRadialGradient(px, py, 0, px, py, glowRadius);
+                        let grad = eCtx.createRadialGradient(node.currentX, node.currentY, 0, node.currentX, node.currentY, glowSize);
                         grad.addColorStop(0, `rgba(255, 255, 255, ${node.energy * 0.9})`);
-                        grad.addColorStop(0.3, `rgba(255, 150, 0, ${node.energy * 0.6})`);
-                        grad.addColorStop(1, `rgba(255, 80, 0, 0)`);
+                        grad.addColorStop(0.2, `rgba(255, 150, 0, ${node.energy * 0.6})`);
+                        grad.addColorStop(1, `rgba(255, 50, 0, 0)`);
                         
                         eCtx.fillStyle = grad;
                         eCtx.beginPath();
-                        eCtx.arc(px, py, glowRadius, 0, Math.PI*2);
+                        eCtx.arc(node.currentX, node.currentY, glowSize, 0, Math.PI*2);
                         eCtx.fill();
-                    }
-
-                    // MODO CALIBRACIÓN (DEBUG)
-                    if (DEBUG_HOVER) {
-                        eCtx.globalCompositeOperation = "source-over";
-                        eCtx.strokeStyle = "rgba(255,255,255,0.4)"; eCtx.lineWidth = 1;
-                        eCtx.beginPath(); eCtx.arc(node.nx * canvasW, node.ny * canvasH, node.radius * canvasW, 0, Math.PI*2); eCtx.stroke();
-                        eCtx.fillStyle = "#fff"; eCtx.font = "10px monospace";
-                        eCtx.fillText(node.name, (node.nx * canvasW) + 10, (node.ny * canvasH));
                     }
                 });
 
-                // 3. EFECTO ESPECIAL: DESTELLO DE OJOS CIAN
-                let distEyes = Math.hypot(mouseNx - EYES_CENTER.nx, mouseNy - EYES_CENTER.ny);
-                let eyesTarget = (isHovering && distEyes < 0.15) ? 1.0 : 0.0;
-                eyesFlareEnergy += (eyesTarget - eyesFlareEnergy) * 0.15;
+                // 4. DIBUJAR DESTELLO DE OJOS CIAN (LENS FLARE CALIBRADO)
+                if (maxEyeEnergy > 0.01) {
+                    ['left', 'right'].forEach(side => {
+                        let ex = EYES_CENTER[side].nx * eW;
+                        let ey = EYES_CENTER[side].ny * eH;
 
-                if (eyesFlareEnergy > 0.01) {
-                    let ex = EYES_CENTER.nx * canvasW;
-                    let ey = EYES_CENTER.ny * canvasH;
-                    
-                    // Radial Glow Central
-                    let eyeGrad = eCtx.createRadialGradient(ex, ey, 0, ex, ey, 100 * eyesFlareEnergy);
-                    eyeGrad.addColorStop(0, `rgba(0, 255, 255, ${eyesFlareEnergy * 0.8})`);
-                    eyeGrad.addColorStop(1, `rgba(0, 100, 255, 0)`);
-                    eCtx.fillStyle = eyeGrad;
-                    eCtx.beginPath(); eCtx.arc(ex, ey, 100 * eyesFlareEnergy, 0, Math.PI*2); eCtx.fill();
+                        // Radial Glow Cyan
+                        let eyeGlow = eCtx.createRadialGradient(ex, ey, 0, ex, ey, 60 * maxEyeEnergy);
+                        eyeGlow.addColorStop(0, `rgba(0, 255, 255, ${maxEyeEnergy * 0.9})`);
+                        eyeGlow.addColorStop(1, `rgba(0, 255, 255, 0)`);
+                        eCtx.fillStyle = eyeGlow;
+                        eCtx.beginPath(); eCtx.arc(ex, ey, 60 * maxEyeEnergy, 0, Math.PI*2); eCtx.fill();
 
-                    // Lens Flare Horizontal
-                    let flareW = 200 * eyesFlareEnergy;
-                    let flareGrad = eCtx.createRadialGradient(ex, ey, 0, ex, ey, flareW);
-                    flareGrad.addColorStop(0, `rgba(255, 255, 255, ${eyesFlareEnergy})`);
-                    flareGrad.addColorStop(0.1, `rgba(0, 229, 255, ${eyesFlareEnergy})`);
-                    flareGrad.addColorStop(1, `rgba(0, 229, 255, 0)`);
-                    eCtx.fillStyle = flareGrad;
-                    
-                    eCtx.beginPath();
-                    eCtx.ellipse(ex, ey, flareW, 2 + (eyesFlareEnergy*2), 0, 0, Math.PI*2);
-                    eCtx.fill();
+                        // Horizontal Lens Flare (Cyan/White)
+                        let flareWidth = 150 * maxEyeEnergy;
+                        let flareGrad = eCtx.createRadialGradient(ex, ey, 0, ex, ey, flareWidth);
+                        flareGrad.addColorStop(0, `rgba(255, 255, 255, ${maxEyeEnergy})`);
+                        flareGrad.addColorStop(0.1, `rgba(0, 229, 255, ${maxEyeEnergy})`);
+                        flareGrad.addColorStop(1, `rgba(0, 229, 255, 0)`);
+                        eCtx.fillStyle = flareGrad;
+                        
+                        eCtx.beginPath();
+                        eCtx.ellipse(ex, ey, flareWidth, 1.5 + (maxEyeEnergy), 0, 0, Math.PI*2);
+                        eCtx.fill();
+                    });
                 }
 
-                // DEBUG INFO GLOBAL
-                if (DEBUG_HOVER) {
-                    eCtx.globalCompositeOperation = "source-over";
-                    eCtx.strokeStyle = "#00E5FF"; eCtx.lineWidth = 1;
-                    eCtx.strokeRect(0, 0, canvasW, canvasH); // Bounding Box del Hotspot
+                // 5. MODO DEBUG VISUAL (Si DEBUG_ENERGY == true)
+                if (DEBUG_ENERGY) {
+                    eCtx.globalCompositeOperation = 'source-over';
+                    
+                    // Bordes del contenedor
+                    eCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)'; eCtx.strokeRect(0,0, eW, eH);
+                    
+                    // Info Mouse
+                    eCtx.fillStyle = 'white'; eCtx.font = "12px monospace";
+                    eCtx.fillText(`Mouse NX: ${(mouseX/eW).toFixed(2)}, NY: ${(mouseY/eH).toFixed(2)}`, 20, 30);
 
-                    // Cruz Cyan en Ojos
-                    eCtx.beginPath();
-                    eCtx.moveTo((EYES_CENTER.nx * canvasW) - 10, EYES_CENTER.ny * canvasH); eCtx.lineTo((EYES_CENTER.nx * canvasW) + 10, EYES_CENTER.ny * canvasH);
-                    eCtx.moveTo(EYES_CENTER.nx * canvasW, (EYES_CENTER.ny * canvasH) - 10); eCtx.lineTo(EYES_CENTER.nx * canvasW, (EYES_CENTER.ny * canvasH) + 10);
-                    eCtx.stroke();
+                    // Puntos de Nodos
+                    ENERGY_NODES.forEach(n => {
+                        eCtx.beginPath(); eCtx.arc(n.nx * eW, n.ny * eH, n.radius * eW, 0, Math.PI*2);
+                        eCtx.strokeStyle = 'rgba(255,100,0,0.5)'; eCtx.stroke();
+                        eCtx.fillText(n.id, n.nx * eW + 10, n.ny * eH);
+                    });
 
-                    eCtx.fillStyle = "#fff"; eCtx.font = "12px monospace";
-                    eCtx.fillText(`Mouse: X: ${mouseNx.toFixed(2)}, Y: ${mouseNy.toFixed(2)}`, 10, 20);
+                    // Puntos de Ojos
+                    ['left', 'right'].forEach(side => {
+                        let ex = EYES_CENTER[side].nx * eW, ey = EYES_CENTER[side].ny * eH;
+                        eCtx.beginPath(); eCtx.moveTo(ex-10, ey); eCtx.lineTo(ex+10, ey); eCtx.stroke();
+                        eCtx.beginPath(); eCtx.moveTo(ex, ey-10); eCtx.lineTo(ex, ey+10); eCtx.stroke();
+                    });
                 }
 
-                requestAnimationFrame(renderEnergyLoop);
+                requestAnimationFrame(renderLivingEnergy);
             }
             
-            // Iniciar el loop del canvas secundario
-            renderEnergyLoop();
+            // Iniciar loop de energía viva
+            renderLivingEnergy();
         });
     </script>
 </body>
