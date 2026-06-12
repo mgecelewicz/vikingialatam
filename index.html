@@ -49,73 +49,15 @@
             transform: translateY(-2px);
         }
 
-        /* ============================================================
-           EFECTO 1: HOVER OJOS (Lens Flare + Glow Cyan)
-           ============================================================ */
-        .lens-flare-core {
-            position: absolute; width: 140px; height: 2px;
-            background: #FFFFFF;
-            box-shadow: 0 0 10px #00E5FF, 0 0 20px #00E5FF, 0 0 40px #00E5FF;
-            border-radius: 50%; transform: scaleX(0); opacity: 0;
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-            pointer-events: none;
-        }
-        .eye-glow-radial {
-            position: absolute; width: 100px; height: 100px;
-            background: radial-gradient(circle, rgba(0,229,255,0.8) 0%, rgba(0,229,255,0.2) 40%, transparent 70%);
-            mix-blend-mode: screen; transform: scale(0.8); opacity: 0;
-            transition: transform 0.6s ease-out, opacity 0.4s ease;
-            pointer-events: none;
-        }
-        body.post-hero-active #hotspot-eyes:hover .lens-flare-core { transform: scaleX(1); opacity: 1; }
-        body.post-hero-active #hotspot-eyes:hover .eye-glow-radial { transform: scale(1.1); opacity: 1; }
+        /* ACTIVACIÓN ESTRICTA DEL NUEVO HOTSPOT 
+           Se activa únicamente cuando la Fase 3 está en marcha
+        */
+        #energy-interaction-hotspot { pointer-events: none; }
+        body.post-hero-active #energy-interaction-hotspot { pointer-events: auto; cursor: crosshair; }
 
-        /* ============================================================
-           EFECTO 2: HOVER CUERPO (Flujo de Energía Solar Interna)
-           ============================================================ */
-        .energy-flow-overlay {
-            position: absolute; inset: 0; pointer-events: none; opacity: 0;
-            transition: opacity 0.6s ease-out;
-            mix-blend-mode: color-dodge; /* Ilumina las líneas doradas de la imagen original */
-            -webkit-mask-image: radial-gradient(ellipse 40% 60% at 75% 55%, black 40%, transparent 80%);
-            mask-image: radial-gradient(ellipse 40% 60% at 75% 55%, black 40%, transparent 80%);
-        }
-        
-        /* Activador por Clase en JS */
-        body.post-hero-active.body-energy-active .energy-flow-overlay { opacity: 1; }
-
-        /* Capas internas solares del Flujo */
-        .solar-base {
-            position: absolute; inset: 0;
-            background: radial-gradient(circle at 75% 50%, rgba(212, 175, 55, 0.5), transparent 60%);
-        }
-        .solar-pulse {
-            position: absolute; inset: 0;
-            background: radial-gradient(circle at 75% 55%, rgba(255, 120, 0, 0.6), transparent 45%);
-            animation: pulse-solar 1.5s ease-in-out infinite alternate;
-        }
-        .solar-shimmer {
-            position: absolute; inset: 0;
-            background: linear-gradient(180deg, transparent 0%, rgba(255, 220, 100, 0.7) 50%, transparent 100%);
-            background-size: 100% 200%;
-            animation: flow-down 2s linear infinite;
-        }
-
-        @keyframes pulse-solar { 0% { transform: scale(0.95); opacity: 0.6; } 100% { transform: scale(1.05); opacity: 1; } }
-        @keyframes flow-down { 0% { background-position: 0 -100%; } 100% { background-position: 0 200%; } }
-
-        /* ============================================================
-           ACTIVACIÓN ESTRICTA DE HOTSPOTS
-           ============================================================ */
-        #hotspot-eyes, #hotspot-body { pointer-events: none; }
-        body.post-hero-active #hotspot-eyes, 
-        body.post-hero-active #hotspot-body { pointer-events: auto; }
-
-        /* MODO DEBUG VISUAL */
+        /* MODO DEBUG GENERAL */
         #debug-panel { display: none; }
         body.debug-mode #debug-panel { display: block; }
-        body.debug-mode #hotspot-eyes { border: 2px dashed #00E5FF; background: rgba(0,229,255,0.2); }
-        body.debug-mode #hotspot-body { border: 2px dashed #D4AF37; background: rgba(212,175,55,0.2); }
     </style>
 </head>
 <body class="text-white selection:bg-viking-gold selection:text-black font-sans">
@@ -135,7 +77,6 @@
         <span id="dbg-phase">Phase: -</span><br>
         <span id="dbg-progress">Progress: -</span><br>
         <span id="dbg-frame">Frame ID: -</span><br>
-        <span id="dbg-hover" class="text-viking-gold">Hover status: Esperando...</span>
     </div>
 
     <!-- NAVEGACIÓN (Z-50) -->
@@ -168,13 +109,6 @@
                 <span class="text-[9px] tracking-[0.4em] uppercase text-gray-500 font-light">Desliza para explorar</span>
             </div>
 
-            <!-- CAPA OVERLAY ENERGÍA SOLAR (Z-25) - Entre imagen e UI -->
-            <div class="energy-flow-overlay z-[25]">
-                <div class="solar-base"></div>
-                <div class="solar-pulse"></div>
-                <div class="solar-shimmer"></div>
-            </div>
-
             <!-- UI CENTRAL POST-HERO (Z-30) -->
             <div id="post-hero-ui" class="absolute inset-0 z-30 flex flex-col items-center justify-center px-4 text-center opacity-0 pointer-events-none transform translate-y-8 transition-transform duration-500">
                 <h1 class="text-4xl sm:text-6xl md:text-[5rem] lg:text-[5.5rem] font-bold tracking-[0.25em] uppercase leading-none mb-6 drop-shadow-2xl">
@@ -189,19 +123,10 @@
                 </a>
             </div>
 
-            <!-- CONTENEDOR UNIFICADO DE HOTSPOTS (Z-40) -->
-            <!-- Limitado exactamente al 45% del ancho a la derecha para no tapar los botones centrales -->
+            <!-- CONTENEDOR UNIFICADO INTERACTIVO DE ENERGÍA (Z-40) -->
             <div id="energy-subject-layer" class="absolute inset-y-0 right-0 w-[45%] z-40 pointer-events-none">
-                
-                <!-- Hotspot Cuerpo (Torso, barba y hombros) -->
-                <div id="hotspot-body" class="absolute top-[12%] left-[5%] w-[85%] h-[80%] rounded-[30%] cursor-crosshair"></div>
-                
-                <!-- Hotspot Ojos (Exactamente sobre el rostro) -->
-                <div id="hotspot-eyes" class="absolute top-[22%] left-[40%] w-[25%] h-[12%] rounded-full cursor-pointer flex items-center justify-center">
-                    <div class="eye-glow-radial"></div>
-                    <div class="lens-flare-core"></div>
-                </div>
-
+                <canvas id="energy-interaction-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+                <div id="energy-interaction-hotspot" class="absolute inset-0"></div>
             </div>
 
         </div>
@@ -217,14 +142,17 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // === CONTROL DE DIAGNÓSTICO ===
-            const DEBUG = false; // <-- Puesto en false para producción. (Cámbialo a true para ver cajas rojas/logs visibles).
-            
-            if (DEBUG) {
-                document.body.classList.add('debug-mode');
-            }
+            // ==========================================
+            // CONFIGURACIONES Y DEBUG
+            // ==========================================
+            const DEBUG_MOTOR = false; 
+            const DEBUG_HOVER = false; // Cambiar a true para calibrar coords visualmente
 
-            // Referencias DOM
+            if (DEBUG_MOTOR) document.body.classList.add('debug-mode');
+
+            // ==========================================
+            // MOTOR FLUIDO DEL HERO (Intacto)
+            // ==========================================
             const canvas = document.getElementById("hero-canvas");
             const ctx = canvas.getContext("2d", { alpha: false });
             const bridgeImg = document.getElementById("bridge-image");
@@ -233,58 +161,35 @@
             const postHeroUI = document.getElementById("post-hero-ui");
             const loader = document.getElementById("loader");
             const loaderText = document.getElementById("loader-text");
-            
-            const hotspotEyes = document.getElementById("hotspot-eyes");
-            const hotspotBody = document.getElementById("hotspot-body");
-            const dbgHover = document.getElementById("dbg-hover");
 
-            // Arrays y Variables LERP
             let frames = [];
-            let targetScroll = 0;
-            let currentScroll = 0;
+            let targetScroll = 0, currentScroll = 0;
             let currentFrameIndex = 0;
             let currentPhase = "INIT";
-            
-            const heroEnd = 0.75;
-            const handoffEnd = 0.85;
-            const postHeroStart = 0.85;
+            const heroEnd = 0.75, handoffEnd = 0.85, postHeroStart = 0.85;
 
-            // 1. EXTRACTOR FLUIDO EN MEMORIA
             async function extractVideoFrames() {
                 return new Promise((resolve) => {
                     const tempVid = document.createElement('video');
-                    tempVid.muted = true;
-                    tempVid.playsInline = true;
-                    tempVid.crossOrigin = 'anonymous';
+                    tempVid.muted = true; tempVid.playsInline = true; tempVid.crossOrigin = 'anonymous';
                     tempVid.src = "https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/FINAL%20final.mp4?v=20260611-3";
 
                     tempVid.addEventListener('loadeddata', async () => {
-                        const duration = tempVid.duration || 6;
-                        const fps = 24;
-                        const totalFrames = Math.floor(duration * fps);
-                        
-                        const targetHeight = Math.min(tempVid.videoHeight, 720);
-                        const scale = targetHeight / tempVid.videoHeight;
+                        const fps = 24; const totalFrames = Math.floor((tempVid.duration || 6) * fps);
+                        const scale = Math.min(tempVid.videoHeight, 720) / tempVid.videoHeight;
                         canvas.width = Math.floor(tempVid.videoWidth * scale);
                         canvas.height = Math.floor(tempVid.videoHeight * scale);
 
-                        const offCanvas = document.createElement('canvas');
-                        offCanvas.width = canvas.width; offCanvas.height = canvas.height;
-                        const offCtx = offCanvas.getContext('2d', { alpha: false });
+                        const offCtx = Object.assign(document.createElement('canvas'), {width: canvas.width, height: canvas.height}).getContext('2d', {alpha: false});
 
                         for (let i = 0; i < totalFrames; i++) {
                             tempVid.currentTime = i / fps;
                             await new Promise(r => tempVid.addEventListener('seeked', r, {once: true}));
-                            
                             offCtx.drawImage(tempVid, 0, 0, canvas.width, canvas.height);
-                            try {
-                                const bitmap = await createImageBitmap(offCanvas);
-                                frames.push(bitmap);
-                            } catch(e) {
-                                const c = document.createElement('canvas');
-                                c.width = canvas.width; c.height = canvas.height;
-                                c.getContext('2d', {alpha: false}).drawImage(offCanvas, 0, 0);
-                                frames.push(c);
+                            try { frames.push(await createImageBitmap(offCtx.canvas)); } 
+                            catch(e) { 
+                                const c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height;
+                                c.getContext('2d', {alpha:false}).drawImage(offCtx.canvas, 0, 0); frames.push(c); 
                             }
                             loaderText.innerText = `Renderizando Motor... ${Math.floor((i/totalFrames)*100)}%`;
                         }
@@ -295,113 +200,220 @@
             }
 
             extractVideoFrames().then(() => {
-                loader.classList.add("opacity-0");
-                setTimeout(() => loader.style.display = "none", 1000);
+                loader.classList.add("opacity-0"); setTimeout(() => loader.style.display = "none", 1000);
                 if(frames.length > 0) ctx.drawImage(frames[0], 0, 0, canvas.width, canvas.height);
                 updateMotor();
             });
 
             window.addEventListener("scroll", () => {
                 const wrapper = document.getElementById("scroll-wrapper");
-                const maxScroll = wrapper.scrollHeight - window.innerHeight;
-                targetScroll = Math.max(0, Math.min(1, (window.scrollY - wrapper.offsetTop) / maxScroll));
+                targetScroll = Math.max(0, Math.min(1, (window.scrollY - wrapper.offsetTop) / (wrapper.scrollHeight - window.innerHeight)));
             });
 
             function updateMotor() {
                 currentScroll += (targetScroll - currentScroll) * 0.08;
                 let targetFrame = 0;
 
-                // FASE 1: HERO
                 if (currentScroll <= heroEnd) {
                     if (currentPhase !== "HERO") {
-                        currentPhase = "HERO";
-                        document.body.classList.remove('post-hero-active');
-                        document.body.classList.remove('body-energy-active'); // Aseguramos que la energía apague
+                        currentPhase = "HERO"; document.body.classList.remove('post-hero-active');
                         nav.style.opacity = 0; nav.style.pointerEvents = "none";
-                        postHeroUI.style.opacity = 0; postHeroUI.style.transform = `translateY(30px)`;
-                        bridgeImg.style.opacity = 0;
+                        postHeroUI.style.opacity = 0; postHeroUI.style.transform = `translateY(30px)`; bridgeImg.style.opacity = 0;
                     }
                     targetFrame = Math.floor((currentScroll / heroEnd) * (frames.length - 1));
                     scrolldown.style.opacity = Math.max(0, 1 - (currentScroll / 0.1));
-                } 
-                // FASE 2: HANDOFF
-                else if (currentScroll <= handoffEnd) {
-                    if (currentPhase !== "HANDOFF") {
-                        currentPhase = "HANDOFF";
-                        document.body.classList.remove('post-hero-active');
-                        document.body.classList.remove('body-energy-active');
-                        scrolldown.style.opacity = 0;
-                    }
+                } else if (currentScroll <= handoffEnd) {
+                    if (currentPhase !== "HANDOFF") { currentPhase = "HANDOFF"; document.body.classList.remove('post-hero-active'); scrolldown.style.opacity = 0; }
+                    targetFrame = frames.length - 1; bridgeImg.style.opacity = (currentScroll - heroEnd) / (handoffEnd - heroEnd);
+                } else {
+                    if (currentPhase !== "POST_HERO") { currentPhase = "POST_HERO"; bridgeImg.style.opacity = 1; document.body.classList.add('post-hero-active'); }
                     targetFrame = frames.length - 1;
-                    bridgeImg.style.opacity = (currentScroll - heroEnd) / (handoffEnd - heroEnd);
-                } 
-                // FASE 3: POST-HERO (SECCIÓN 2)
-                else {
-                    if (currentPhase !== "POST_HERO") {
-                        currentPhase = "POST_HERO";
-                        bridgeImg.style.opacity = 1;
-                        document.body.classList.add('post-hero-active'); 
-                    }
-                    targetFrame = frames.length - 1;
-
                     let uiProgress = Math.max(0, Math.min(1, ((currentScroll - postHeroStart) / (1 - postHeroStart)) * 2));
-                    nav.style.opacity = uiProgress;
-                    nav.style.pointerEvents = uiProgress > 0.5 ? "auto" : "none";
-                    postHeroUI.style.opacity = uiProgress;
-                    postHeroUI.style.transform = `translateY(${(1 - uiProgress) * 30}px)`;
+                    nav.style.opacity = uiProgress; nav.style.pointerEvents = uiProgress > 0.5 ? "auto" : "none";
+                    postHeroUI.style.opacity = uiProgress; postHeroUI.style.transform = `translateY(${(1 - uiProgress) * 30}px)`;
                 }
 
                 currentFrameIndex += (targetFrame - currentFrameIndex) * 0.2;
                 let drawIndex = Math.max(0, Math.min(frames.length - 1, Math.floor(currentFrameIndex)));
-                if (frames.length > 0) {
-                    ctx.drawImage(frames[drawIndex], 0, 0, canvas.width, canvas.height);
-                }
-
-                if (DEBUG) {
+                if (frames.length > 0) ctx.drawImage(frames[drawIndex], 0, 0, canvas.width, canvas.height);
+                
+                if (DEBUG_MOTOR) {
                     document.getElementById("dbg-phase").innerText = `Phase: ${currentPhase}`;
                     document.getElementById("dbg-progress").innerText = `Progress: ${(currentScroll * 100).toFixed(2)}%`;
                     document.getElementById("dbg-frame").innerText = `Frame: ${drawIndex} / ${frames.length - 1}`;
                 }
-
                 requestAnimationFrame(updateMotor);
             }
 
             // ==========================================
-            // LÓGICA DE HOTSPOTS POR JAVASCRIPT
+            // MOTOR DE ENERGÍA INTERACTIVA (HOVERS SECCIÓN 2)
             // ==========================================
+            const eCanvas = document.getElementById("energy-interaction-canvas");
+            const eCtx = eCanvas.getContext("2d");
+            const eHotspot = document.getElementById("energy-interaction-hotspot");
+
+            // Nodos (Coordenadas X, Y normalizadas al 45% del div derecho)
+            const ENERGY_NODES = [
+                { id: 0, name: 'Ojo Izquierdo', nx: 0.38, ny: 0.22, radius: 0.1, energy: 0, pulse: 0 },
+                { id: 1, name: 'Ojo Derecho',   nx: 0.52, ny: 0.22, radius: 0.1, energy: 0, pulse: 0 },
+                { id: 2, name: 'Rostro',        nx: 0.45, ny: 0.28, radius: 0.15, energy: 0, pulse: 0 },
+                { id: 3, name: 'Barba',         nx: 0.45, ny: 0.42, radius: 0.15, energy: 0, pulse: 0 },
+                { id: 4, name: 'Pecho',         nx: 0.45, ny: 0.60, radius: 0.2, energy: 0, pulse: 0 },
+                { id: 5, name: 'Hombro Izq',    nx: 0.15, ny: 0.55, radius: 0.18, energy: 0, pulse: 0 },
+                { id: 6, name: 'Hombro Der',    nx: 0.75, ny: 0.55, radius: 0.18, energy: 0, pulse: 0 },
+                { id: 7, name: 'Torso Izq',     nx: 0.25, ny: 0.85, radius: 0.18, energy: 0, pulse: 0 },
+                { id: 8, name: 'Torso Der',     nx: 0.65, ny: 0.85, radius: 0.18, energy: 0, pulse: 0 }
+            ];
+
+            // Conexiones de energía (Líneas)
+            const ENERGY_EDGES = [
+                [0,2], [1,2], [2,3], [3,4], [4,5], [4,6], [4,7], [4,8], [5,7], [6,8]
+            ];
+
+            const EYES_CENTER = { nx: 0.45, ny: 0.22 };
+
+            let mouseNx = -1, mouseNy = -1;
+            let isHovering = false;
+            let eyesFlareEnergy = 0;
+            let canvasW = 0, canvasH = 0;
+
+            function resizeEnergyCanvas() {
+                const rect = eHotspot.getBoundingClientRect();
+                eCanvas.width = rect.width;
+                eCanvas.height = rect.height;
+                canvasW = rect.width;
+                canvasH = rect.height;
+            }
+            window.addEventListener('resize', resizeEnergyCanvas);
+            resizeEnergyCanvas(); // Inicio
+
+            eHotspot.addEventListener('mousemove', (e) => {
+                const rect = eHotspot.getBoundingClientRect();
+                mouseNx = (e.clientX - rect.left) / rect.width;
+                mouseNy = (e.clientY - rect.top) / rect.height;
+                isHovering = true;
+            });
+            eHotspot.addEventListener('mouseleave', () => { isHovering = false; });
+
+            function renderEnergyLoop() {
+                // Borrado del frame para el canvas de efectos
+                eCtx.clearRect(0, 0, canvasW, canvasH);
+
+                if (!document.body.classList.contains('post-hero-active')) {
+                    isHovering = false; // Reset de seguridad
+                }
+
+                eCtx.globalCompositeOperation = "lighter";
+
+                // 1. DIBUJO DE LÍNEAS DE ENERGÍA Y PULSOS
+                ENERGY_EDGES.forEach(edge => {
+                    let n1 = ENERGY_NODES[edge[0]];
+                    let n2 = ENERGY_NODES[edge[1]];
+                    let maxE = Math.max(n1.energy, n2.energy);
+                    
+                    if (maxE > 0.01) {
+                        eCtx.beginPath();
+                        eCtx.moveTo(n1.nx * canvasW, n1.ny * canvasH);
+                        eCtx.lineTo(n2.nx * canvasW, n2.ny * canvasH);
+                        eCtx.strokeStyle = `rgba(255, 170, 0, ${maxE * 0.7})`;
+                        eCtx.lineWidth = 1 + (maxE * 3);
+                        eCtx.stroke();
+                        
+                        // Partícula sutil viajando
+                        let travelProgress = (Date.now() / 1000 % 1);
+                        let px = n1.nx + (n2.nx - n1.nx) * travelProgress;
+                        let py = n1.ny + (n2.ny - n1.ny) * travelProgress;
+                        eCtx.beginPath();
+                        eCtx.arc(px * canvasW, py * canvasH, 2 * maxE, 0, Math.PI*2);
+                        eCtx.fillStyle = `rgba(255, 220, 150, ${maxE})`;
+                        eCtx.fill();
+                    }
+                });
+
+                // 2. CÁLCULO Y DIBUJO DE NODOS DE ENERGÍA (CUERPO)
+                ENERGY_NODES.forEach(node => {
+                    let dist = Math.hypot(mouseNx - node.nx, mouseNy - node.ny);
+                    let targetEnergy = (isHovering && dist < node.radius) ? 1.0 : 0.0;
+                    
+                    node.energy += (targetEnergy - node.energy) * 0.1; // Smooth LERP
+                    node.pulse += 0.1;
+
+                    if (node.energy > 0.01) {
+                        let px = node.nx * canvasW;
+                        let py = node.ny * canvasH;
+                        let glowRadius = (canvasW * 0.15) * node.energy + Math.sin(node.pulse)*2;
+                        
+                        let grad = eCtx.createRadialGradient(px, py, 0, px, py, glowRadius);
+                        grad.addColorStop(0, `rgba(255, 255, 255, ${node.energy * 0.9})`);
+                        grad.addColorStop(0.3, `rgba(255, 150, 0, ${node.energy * 0.6})`);
+                        grad.addColorStop(1, `rgba(255, 80, 0, 0)`);
+                        
+                        eCtx.fillStyle = grad;
+                        eCtx.beginPath();
+                        eCtx.arc(px, py, glowRadius, 0, Math.PI*2);
+                        eCtx.fill();
+                    }
+
+                    // MODO CALIBRACIÓN (DEBUG)
+                    if (DEBUG_HOVER) {
+                        eCtx.globalCompositeOperation = "source-over";
+                        eCtx.strokeStyle = "rgba(255,255,255,0.4)"; eCtx.lineWidth = 1;
+                        eCtx.beginPath(); eCtx.arc(node.nx * canvasW, node.ny * canvasH, node.radius * canvasW, 0, Math.PI*2); eCtx.stroke();
+                        eCtx.fillStyle = "#fff"; eCtx.font = "10px monospace";
+                        eCtx.fillText(node.name, (node.nx * canvasW) + 10, (node.ny * canvasH));
+                    }
+                });
+
+                // 3. EFECTO ESPECIAL: DESTELLO DE OJOS CIAN
+                let distEyes = Math.hypot(mouseNx - EYES_CENTER.nx, mouseNy - EYES_CENTER.ny);
+                let eyesTarget = (isHovering && distEyes < 0.15) ? 1.0 : 0.0;
+                eyesFlareEnergy += (eyesTarget - eyesFlareEnergy) * 0.15;
+
+                if (eyesFlareEnergy > 0.01) {
+                    let ex = EYES_CENTER.nx * canvasW;
+                    let ey = EYES_CENTER.ny * canvasH;
+                    
+                    // Radial Glow Central
+                    let eyeGrad = eCtx.createRadialGradient(ex, ey, 0, ex, ey, 100 * eyesFlareEnergy);
+                    eyeGrad.addColorStop(0, `rgba(0, 255, 255, ${eyesFlareEnergy * 0.8})`);
+                    eyeGrad.addColorStop(1, `rgba(0, 100, 255, 0)`);
+                    eCtx.fillStyle = eyeGrad;
+                    eCtx.beginPath(); eCtx.arc(ex, ey, 100 * eyesFlareEnergy, 0, Math.PI*2); eCtx.fill();
+
+                    // Lens Flare Horizontal
+                    let flareW = 200 * eyesFlareEnergy;
+                    let flareGrad = eCtx.createRadialGradient(ex, ey, 0, ex, ey, flareW);
+                    flareGrad.addColorStop(0, `rgba(255, 255, 255, ${eyesFlareEnergy})`);
+                    flareGrad.addColorStop(0.1, `rgba(0, 229, 255, ${eyesFlareEnergy})`);
+                    flareGrad.addColorStop(1, `rgba(0, 229, 255, 0)`);
+                    eCtx.fillStyle = flareGrad;
+                    
+                    eCtx.beginPath();
+                    eCtx.ellipse(ex, ey, flareW, 2 + (eyesFlareEnergy*2), 0, 0, Math.PI*2);
+                    eCtx.fill();
+                }
+
+                // DEBUG INFO GLOBAL
+                if (DEBUG_HOVER) {
+                    eCtx.globalCompositeOperation = "source-over";
+                    eCtx.strokeStyle = "#00E5FF"; eCtx.lineWidth = 1;
+                    eCtx.strokeRect(0, 0, canvasW, canvasH); // Bounding Box del Hotspot
+
+                    // Cruz Cyan en Ojos
+                    eCtx.beginPath();
+                    eCtx.moveTo((EYES_CENTER.nx * canvasW) - 10, EYES_CENTER.ny * canvasH); eCtx.lineTo((EYES_CENTER.nx * canvasW) + 10, EYES_CENTER.ny * canvasH);
+                    eCtx.moveTo(EYES_CENTER.nx * canvasW, (EYES_CENTER.ny * canvasH) - 10); eCtx.lineTo(EYES_CENTER.nx * canvasW, (EYES_CENTER.ny * canvasH) + 10);
+                    eCtx.stroke();
+
+                    eCtx.fillStyle = "#fff"; eCtx.font = "12px monospace";
+                    eCtx.fillText(`Mouse: X: ${mouseNx.toFixed(2)}, Y: ${mouseNy.toFixed(2)}`, 10, 20);
+                }
+
+                requestAnimationFrame(renderEnergyLoop);
+            }
             
-            // Ojos
-            hotspotEyes.addEventListener("mouseenter", () => {
-                if(!document.body.classList.contains('post-hero-active')) return;
-                console.log("EYES ENTER");
-                if(DEBUG) dbgHover.innerText = "Hover status: EYES ACTIVE";
-            });
-            hotspotEyes.addEventListener("mouseleave", () => {
-                if(!document.body.classList.contains('post-hero-active')) return;
-                console.log("EYES LEAVE");
-                if(DEBUG) dbgHover.innerText = "Hover status: Esperando...";
-            });
-
-            // Cuerpo Energético
-            hotspotBody.addEventListener("mouseenter", () => {
-                if(!document.body.classList.contains('post-hero-active')) return;
-                
-                // Activar la capa visual del cuerpo
-                document.body.classList.add('body-energy-active');
-                
-                console.log("BODY ENTER");
-                if(DEBUG) dbgHover.innerText = "Hover status: BODY ACTIVE";
-            });
-            hotspotBody.addEventListener("mouseleave", () => {
-                if(!document.body.classList.contains('post-hero-active')) return;
-                
-                // Desactivar la capa visual del cuerpo
-                document.body.classList.remove('body-energy-active');
-                
-                console.log("BODY LEAVE");
-                if(DEBUG) dbgHover.innerText = "Hover status: Esperando...";
-            });
-
+            // Iniciar el loop del canvas secundario
+            renderEnergyLoop();
         });
     </script>
 </body>
