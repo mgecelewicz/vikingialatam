@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -50,25 +49,9 @@
             transform: translateY(-2px);
         }
 
-        /* Animaciones Scrollytelling Escena 2 */
-        @keyframes blur-reveal {
-            0% { opacity: 0; filter: blur(20px); transform: translateY(50px) scale(0.95); }
-            100% { opacity: 1; filter: blur(0px); transform: translateY(0) scale(1); }
-        }
-        
-        .scroll-reveal-text {
-            animation: blur-reveal linear both;
-            animation-timeline: view();
-            animation-range: entry 10% cover 40%;
-        }
-        
-        .font-serif-italic {
-            font-family: 'Instrument Serif', serif;
-            font-style: italic;
-        }
+        #energy-interaction-hotspot { pointer-events: none; }
+        body.post-hero-active #energy-interaction-hotspot { pointer-events: auto; cursor: crosshair; }
     </style>
-
-    <link rel="stylesheet" href="./living-energy.css">
 </head>
 <body class="text-white selection:bg-viking-gold selection:text-black font-sans">
 
@@ -99,7 +82,6 @@
         <div class="sticky top-0 left-0 w-full h-screen overflow-hidden">
             
             <canvas id="hero-canvas" class="absolute inset-0 w-full h-full object-cover z-0"></canvas>
-
             <img id="bridge-image" src="https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/hero-final-frame.jpeg?v=20260611-3" class="absolute inset-0 w-full h-full object-cover z-10 opacity-0 pointer-events-none" crossorigin="anonymous" />
 
             <div id="scrolldown-indicator" class="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 transition-opacity duration-300">
@@ -121,40 +103,14 @@
             </div>
 
             <div id="energy-subject-layer" class="absolute inset-y-0 right-0 w-[45%] z-40 pointer-events-none">
-                <canvas id="living-energy-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
-                <div id="living-energy-hotspot" class="absolute inset-0"></div>
+                <canvas id="energy-interaction-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+                <div id="energy-interaction-hotspot" class="absolute inset-0"></div>
             </div>
 
         </div>
     </div>
 
-    <section id="manifesto" class="relative w-full min-h-[150vh] bg-[#030303] z-40 flex flex-col items-center py-32 px-6 sm:px-12 border-t border-zinc-900/80 overflow-hidden">
-        <div class="max-w-6xl w-full mx-auto flex flex-col justify-center h-full gap-40">
-            <div class="scroll-reveal-text flex flex-col items-start text-left">
-                <span class="text-viking-gold font-mono text-[10px] tracking-[0.4em] uppercase mb-6 block border-l border-viking-gold pl-4">01 // El Ruido</span>
-                <h2 class="text-4xl md:text-6xl lg:text-[5rem] font-bold tracking-tighter text-white/90 leading-[1.1]">
-                    El ecosistema digital está asfixiado por <br>
-                    <span class="font-serif-italic text-viking-cyan font-normal text-6xl md:text-[5.5rem] lg:text-[7rem] tracking-normal drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]">contenido plástico y efímero.</span>
-                </h2>
-            </div>
-
-            <div class="scroll-reveal-text flex flex-col items-end text-right" style="animation-range: entry 20% cover 50%;">
-                <span class="text-viking-gold font-mono text-[10px] tracking-[0.4em] uppercase mb-6 block border-r border-viking-gold pr-4">02 // El Antídoto</span>
-                <h2 class="text-4xl md:text-6xl lg:text-[5rem] font-bold tracking-tighter text-white/90 leading-[1.1]">
-                    Forjamos narrativas inmersivas que <br>
-                    <span class="font-serif-italic text-viking-champagne font-normal text-6xl md:text-[5.5rem] lg:text-[7rem] tracking-normal drop-shadow-[0_0_15px_rgba(226,199,153,0.3)]">respiran y sienten.</span>
-                </h2>
-            </div>
-
-            <div class="scroll-reveal-text mt-12 mx-auto text-center max-w-2xl" style="animation-range: entry 10% cover 30%;">
-                <p class="text-sm md:text-base text-zinc-400 font-light tracking-[0.15em] leading-relaxed uppercase">
-                    Sistemas visuales impulsados por IA, WebGL y cinematografía interactiva. No maquetamos sitios web; construimos motores de retención.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <div id="portfolio" class="relative w-full min-h-screen bg-[#050505] z-40 flex flex-col items-center justify-center border-t border-zinc-900/50">
+    <div id="portfolio" class="relative w-full min-h-screen bg-[#030303] z-40 flex flex-col items-center justify-center border-t border-zinc-900/50">
         <div class="p-8 border border-zinc-800 bg-zinc-950/50 rounded-lg text-center backdrop-blur-sm">
             <span class="block text-viking-gold font-mono text-xs tracking-widest uppercase mb-2">[ CONTENEDOR FASE 4 ]</span>
             <p class="text-zinc-500 font-mono text-[10px] tracking-widest uppercase">TODO: Insertar viking-profile-3-4.png cuando exista.</p>
@@ -163,6 +119,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            
             const canvas = document.getElementById("hero-canvas");
             const ctx = canvas.getContext("2d", { alpha: false });
             const bridgeImg = document.getElementById("bridge-image");
@@ -179,33 +136,47 @@
             const heroEnd = 0.75, handoffEnd = 0.85, postHeroStart = 0.85;
 
             async function extractVideoFrames() {
-                return new Promise((resolve) => {
-                    const tempVid = document.createElement('video');
-                    tempVid.muted = true; tempVid.playsInline = true; tempVid.crossOrigin = 'anonymous';
-                    tempVid.src = "https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/FINAL%20final.mp4?v=20260611-3";
+                return new Promise(async (resolve) => {
+                    try {
+                        loaderText.innerText = `Descargando Buffer...`;
+                        // Carga en RAM primero para evitar saltos de red al extraer
+                        const res = await fetch("https://raw.githubusercontent.com/mgecelewicz/vikingialatam/main/FINAL%20final.mp4?v=20260611-3");
+                        const blob = await res.blob();
+                        const vidUrl = URL.createObjectURL(blob);
 
-                    tempVid.addEventListener('loadeddata', async () => {
-                        const fps = 24; const totalFrames = Math.floor((tempVid.duration || 6) * fps);
-                        const scale = Math.min(tempVid.videoHeight, 720) / tempVid.videoHeight;
-                        canvas.width = Math.floor(tempVid.videoWidth * scale);
-                        canvas.height = Math.floor(tempVid.videoHeight * scale);
+                        const tempVid = document.createElement('video');
+                        tempVid.muted = true; tempVid.playsInline = true; tempVid.crossOrigin = 'anonymous';
+                        tempVid.src = vidUrl;
 
-                        const offCtx = Object.assign(document.createElement('canvas'), {width: canvas.width, height: canvas.height}).getContext('2d', {alpha: false});
+                        tempVid.addEventListener('loadeddata', async () => {
+                            const fps = 30; // Aumentado a 30fps para no saltear el frame de la explosión
+                            const duration = tempVid.duration || 6;
+                            const totalFrames = Math.floor(duration * fps);
+                            
+                            const targetHeight = Math.min(tempVid.videoHeight, 720);
+                            const scale = targetHeight / tempVid.videoHeight;
+                            canvas.width = Math.floor(tempVid.videoWidth * scale);
+                            canvas.height = Math.floor(tempVid.videoHeight * scale);
 
-                        for (let i = 0; i < totalFrames; i++) {
-                            tempVid.currentTime = i / fps;
-                            await new Promise(r => tempVid.addEventListener('seeked', r, {once: true}));
-                            offCtx.drawImage(tempVid, 0, 0, canvas.width, canvas.height);
-                            try { frames.push(await createImageBitmap(offCtx.canvas)); } 
-                            catch(e) { 
-                                const c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height;
-                                c.getContext('2d', {alpha:false}).drawImage(offCtx.canvas, 0, 0); frames.push(c); 
+                            const offCtx = Object.assign(document.createElement('canvas'), {width: canvas.width, height: canvas.height}).getContext('2d', {alpha: false});
+
+                            for (let i = 0; i < totalFrames; i++) {
+                                tempVid.currentTime = i / fps;
+                                await new Promise(r => tempVid.addEventListener('seeked', r, {once: true}));
+                                offCtx.drawImage(tempVid, 0, 0, canvas.width, canvas.height);
+                                try { frames.push(await createImageBitmap(offCtx.canvas)); } 
+                                catch(e) { 
+                                    const c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height;
+                                    c.getContext('2d', {alpha:false}).drawImage(offCtx.canvas, 0, 0); frames.push(c); 
+                                }
+                                loaderText.innerText = `Procesando... ${Math.floor((i/totalFrames)*100)}%`;
                             }
-                            loaderText.innerText = `Renderizando Motor... ${Math.floor((i/totalFrames)*100)}%`;
-                        }
-                        resolve();
-                    });
-                    setTimeout(resolve, 8000); 
+                            resolve();
+                        });
+                    } catch (err) {
+                        console.error(err);
+                        resolve(); // Fallback silencioso
+                    }
                 });
             }
 
@@ -221,7 +192,7 @@
             });
 
             function updateMotor() {
-                currentScroll += (targetScroll - currentScroll) * 0.08;
+                currentScroll += (targetScroll - currentScroll) * 0.08; // LERP Fluido
                 let targetFrame = 0;
 
                 if (currentScroll <= heroEnd) {
@@ -249,9 +220,134 @@
                 
                 requestAnimationFrame(updateMotor);
             }
+
+            const eCanvas = document.getElementById("energy-interaction-canvas");
+            const eCtx = eCanvas.getContext("2d");
+            const eHotspot = document.getElementById("energy-interaction-hotspot");
+
+            const ENERGY_NODES = [
+                { id: 2, name: 'Frente',        nx: 0.45, ny: 0.15, radius: 0.12, energy: 0 },
+                { id: 3, name: 'Barba',         nx: 0.45, ny: 0.38, radius: 0.15, energy: 0 },
+                { id: 4, name: 'Pecho',         nx: 0.45, ny: 0.60, radius: 0.20, energy: 0 },
+                { id: 5, name: 'Hombro Izq',    nx: 0.15, ny: 0.55, radius: 0.18, energy: 0 },
+                { id: 6, name: 'Hombro Der',    nx: 0.75, ny: 0.55, radius: 0.18, energy: 0 },
+                { id: 7, name: 'Torso Izq',     nx: 0.25, ny: 0.85, radius: 0.18, energy: 0 },
+                { id: 8, name: 'Torso Der',     nx: 0.65, ny: 0.85, radius: 0.18, energy: 0 }
+            ];
+            
+            const EYES_CENTER = { nx: 0.45, ny: 0.22 };
+
+            let mouseNx = -1, mouseNy = -1;
+            let canvasW = 0, canvasH = 0;
+            let eyesFlareEnergy = 0;
+            let ripples = []; // Almacena las ondas de energía expansivas
+
+            function resizeEnergyCanvas() {
+                const rect = eHotspot.getBoundingClientRect();
+                eCanvas.width = rect.width; eCanvas.height = rect.height;
+                canvasW = rect.width; canvasH = rect.height;
+            }
+            window.addEventListener('resize', resizeEnergyCanvas);
+            resizeEnergyCanvas();
+
+            eHotspot.addEventListener('mousemove', (e) => {
+                const rect = eHotspot.getBoundingClientRect();
+                mouseNx = (e.clientX - rect.left) / rect.width;
+                mouseNy = (e.clientY - rect.top) / rect.height;
+            });
+            eHotspot.addEventListener('mouseleave', () => { 
+                mouseNx = -1000; mouseNy = -1000; // Reset inmediato 
+            });
+
+            function renderEnergyLoop() {
+                // Limpieza total obligatoria por frame para evitar rastros sucios
+                eCtx.clearRect(0, 0, canvasW, canvasH);
+
+                if (!document.body.classList.contains('post-hero-active')) {
+                    mouseNx = -1000; mouseNy = -1000;
+                }
+
+                eCtx.globalCompositeOperation = "lighter";
+
+                // 1. GESTIÓN DE NODOS Y ONDAS (RIPPLES)
+                ENERGY_NODES.forEach(node => {
+                    let dist = Math.hypot(mouseNx - node.nx, mouseNy - node.ny);
+                    let isHovered = (dist < node.radius);
+                    
+                    // LERP de energía para el nodo
+                    let targetEnergy = isHovered ? 1.0 : 0.0;
+                    node.energy += (targetEnergy - node.energy) * 0.15;
+
+                    // Si el mouse está encima, crear ondas de forma continua y orgánica
+                    if (isHovered && Math.random() < 0.15) {
+                        ripples.push({
+                            x: node.nx * canvasW, 
+                            y: node.ny * canvasH, 
+                            radius: 0, 
+                            alpha: 1,
+                            color: `rgba(212, 175, 55, ALPHA)` // Dorado vikingo
+                        });
+                    }
+                });
+
+                // Dibujar y expandir las ondas de energía
+                ripples.forEach((r, index) => {
+                    r.radius += 1.5; // Velocidad de expansión
+                    r.alpha -= 0.025; // Velocidad de desvanecimiento
+                    
+                    if (r.alpha <= 0) {
+                        ripples.splice(index, 1);
+                    } else {
+                        eCtx.beginPath();
+                        eCtx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                        eCtx.strokeStyle = r.color.replace('ALPHA', r.alpha.toFixed(2));
+                        eCtx.lineWidth = 1 + (r.alpha * 2);
+                        eCtx.stroke();
+                    }
+                });
+
+                // 2. EFECTO DE DESTELLO REACTIVO EN LOS OJOS
+                let distEyes = Math.hypot(mouseNx - EYES_CENTER.nx, mouseNy - EYES_CENTER.ny);
+                let eyesTarget = (distEyes < 0.15) ? 1.0 : 0.0;
+                
+                // LERP reactivo para que suba rápido y baje suave
+                eyesFlareEnergy += (eyesTarget - eyesFlareEnergy) * 0.2;
+
+                if (eyesFlareEnergy > 0.01) {
+                    let ex = EYES_CENTER.nx * canvasW;
+                    let ey = EYES_CENTER.ny * canvasH;
+                    
+                    // Núcleo hiper-blanco
+                    eCtx.beginPath();
+                    eCtx.arc(ex, ey, 5 * eyesFlareEnergy, 0, Math.PI*2);
+                    eCtx.fillStyle = `rgba(255, 255, 255, ${eyesFlareEnergy})`;
+                    eCtx.fill();
+
+                    // Resplandor Cyan Radial
+                    let eyeGrad = eCtx.createRadialGradient(ex, ey, 0, ex, ey, 120 * eyesFlareEnergy);
+                    eyeGrad.addColorStop(0, `rgba(0, 255, 255, ${eyesFlareEnergy * 0.9})`);
+                    eyeGrad.addColorStop(1, `rgba(0, 100, 255, 0)`);
+                    eCtx.fillStyle = eyeGrad;
+                    eCtx.beginPath(); eCtx.arc(ex, ey, 120 * eyesFlareEnergy, 0, Math.PI*2); eCtx.fill();
+
+                    // Destello de Lente Horizontal Fino
+                    let flareW = 250 * eyesFlareEnergy;
+                    let flareGrad = eCtx.createRadialGradient(ex, ey, 0, ex, ey, flareW);
+                    flareGrad.addColorStop(0, `rgba(255, 255, 255, ${eyesFlareEnergy})`);
+                    flareGrad.addColorStop(0.1, `rgba(0, 229, 255, ${eyesFlareEnergy * 0.8})`);
+                    flareGrad.addColorStop(1, `rgba(0, 229, 255, 0)`);
+                    eCtx.fillStyle = flareGrad;
+                    
+                    eCtx.beginPath();
+                    eCtx.ellipse(ex, ey, flareW, 1.5 + (eyesFlareEnergy), 0, 0, Math.PI*2);
+                    eCtx.fill();
+                }
+
+                requestAnimationFrame(renderEnergyLoop);
+            }
+            
+            renderEnergyLoop();
         });
     </script>
-
-    <script src="./living-energy.js" defer></script>
 </body>
 </html>
